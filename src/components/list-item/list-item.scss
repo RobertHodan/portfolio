@@ -1,0 +1,21 @@
+.list-item {
+    color: #BABABA;
+    list-style-type: none;
+
+    img {
+        .collapsed {
+           transform: rotate(90deg);
+       }
+
+       .selected {
+           color: #E1E1E1;
+           font-weight: 300;
+       }
+    }
+
+    &.focused {
+        > span {
+            border: 1px solid gray;
+        }
+    }
+}
