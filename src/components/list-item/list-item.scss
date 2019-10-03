@@ -1,21 +1,25 @@
 .list-item {
-    color: #BABABA;
-    list-style-type: none;
+  color: #BABABA;
+  list-style-type: none;
 
+  &.collapsed {
     img {
-        .collapsed {
-           transform: rotate(90deg);
-       }
-
-       .selected {
-           color: #E1E1E1;
-           font-weight: 300;
-       }
+      transform: rotate(90deg);
     }
+  }
 
-    &.focused {
-        > span {
-            border: 1px solid gray;
-        }
+  &.selected {
+    img {
+      color: #E1E1E1;
+      font-weight: 300;
     }
+  }
+
+  &:focus {
+    outline: none;
+
+    > span {
+      border: 1px solid gray;
+    }
+  }
 }

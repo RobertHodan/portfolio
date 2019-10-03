@@ -59,10 +59,19 @@ export class TreeListController extends React.Component<TreeListControllerProps,
 
   constructor(props: TreeListControllerProps) {
     super(props);
-    const [list, order] = this.flattenList(props.list) as [TreeListMap, TreeListOrder[]];
+    let [list, order] = this.flattenList(props.list) as [TreeListMap, TreeListOrder[]];
 
     // DEBUGGING
     window.TreeList = this;
+
+    // Ensure that the first item starts off focused, so that it can be tabbed to via keyboard
+    list = update(list, {
+      [order[0].id]: {
+        $merge: {
+          focused: true,
+        },
+      },
+    });
 
     this.state = {
       listOrder: order,
@@ -118,8 +127,10 @@ export class TreeListController extends React.Component<TreeListControllerProps,
         this.focusNextItem();
         break;
       case eventNames.StepOut:
+        this.stepOutOrCollapse();
         break;
       case eventNames.StepIn:
+        this.stepIntoOrExpand();
         break;
       case eventNames.ToggleItem:
         break;
@@ -128,6 +139,60 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       case eventNames.LastItem:
         break;
     }
+  }
+
+  stepIntoOrExpand() {
+    const focusedItem = this.getFocusedItem();
+    if (focusedItem.collapsed) {
+      this.collapseItem(focusedItem, false);
+    } else {
+      this.stepIntoItem(focusedItem);
+    }
+  }
+
+  stepOutOrCollapse() {
+    const focusedItem = this.getFocusedItem();
+    if (!focusedItem.collapsed) {
+      this.collapseItem(focusedItem, true);
+    } else {
+      this.stepOutItem(focusedItem);
+    }
+  }
+
+  stepIntoItem(item: TreeListMapItem) {
+    if (item.childIds.length === 0) {
+      return;
+    }
+
+    const firstChild = this.getChildItemByIndex(item, 0);
+    if (firstChild) {
+      this.focusItem(firstChild);
+    }
+  }
+
+  stepOutItem(item: TreeListMapItem) {
+    if (!item.parentId) {
+      return;
+    }
+
+    const parent = this.state.listMap[item.parentId];
+    if (parent) {
+      this.focusItem(parent);
+    }
+  }
+
+  collapseItem(item: TreeListMapItem, state: boolean) {
+    const newListMap = update(this.state.listMap, {
+      [item.id]: {
+        $merge: {
+          collapsed: state,
+        },
+      },
+    });
+
+    this.setState({
+      listMap: newListMap,
+    });
   }
 
   focusNextItem() {
@@ -150,7 +215,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     this.focusItem(prevItem, focusedItem);
   }
 
-  focusItem(newItem: TreeListMapItem, prevItem: TreeListMapItem) {
+  focusItem(newItem: TreeListMapItem, prevItem: TreeListMapItem = this.getFocusedItem()) {
     const newListMap = update(this.state.listMap, {
       [prevItem.id]: {
         $merge: {
@@ -170,6 +235,36 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     });
   }
 
+  getChildItemByIndex(item: TreeListMapItem, index: number): TreeListMapItem | undefined {
+    return this.getChildItemByIndexRecursive(item, index);
+  }
+
+  getChildItemByIndexRecursive(
+    item: TreeListMapItem,
+    index: number,
+    orderItems: TreeListOrder[] = this.state.listOrder,
+  ): TreeListMapItem | undefined {
+    let child;
+    for (let i=0; i < orderItems.length; i++) {
+      const orderItem = orderItems[i];
+      const itemDetails = this.state.listMap[orderItem.id];
+      if (itemDetails.parentId === item.id && i === index) {
+        child = itemDetails;
+        break;
+      }
+
+      if (orderItem.subItems.length) {
+        const returnedChild = this.getChildItemByIndexRecursive(item, index, orderItem.subItems);
+        if (returnedChild) {
+          child = returnedChild;
+          break;
+        }
+      }
+    }
+
+    return child;
+  }
+
   getFocusedItem(): TreeListMapItem {
     const map = this.state.listMap;
     const id = this.focusedId;
@@ -186,7 +281,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   getNextItemRecursive(
     item: TreeListMapItem,
     orderItems: TreeListOrder[] = this.state.listOrder,
-    targetItem: {wasFound: boolean} = { wasFound: false },
+    targetItem: { wasFound: boolean } = { wasFound: false },
     recursiveCount: number = 0,
   ): TreeListMapItem | undefined {
     let nextItem;
@@ -194,14 +289,15 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       if (nextItem) {
         break;
       }
+      const currentItem = this.state.listMap[orderItem.id];
       if (targetItem.wasFound) {
-        nextItem = this.state.listMap[orderItem.id];
+        nextItem = currentItem;
         break;
       }
       if (orderItem.id === item.id) {
         targetItem.wasFound = true;
       }
-      if (orderItem.subItems.length && !nextItem) {
+      if (orderItem.subItems.length && !nextItem && !currentItem.collapsed) {
         nextItem = this.getNextItemRecursive(item, orderItem.subItems, targetItem, recursiveCount + 1);
       }
     }
@@ -220,18 +316,19 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   getPreviousItemRecursive(
     item: TreeListMapItem,
     orderItems: TreeListOrder[] = this.state.listOrder,
-    targetItem: {wasFound: boolean} = { wasFound: false },
+    targetItem: { wasFound: boolean } = { wasFound: false },
     recursiveCount: number = 0,
   ): TreeListMapItem | undefined {
     let prevItem;
     for (const orderItem of orderItems) {
+      const currentItem = this.state.listMap[orderItem.id];
       if (orderItem.id === item.id || targetItem.wasFound) {
         targetItem.wasFound = true;
         break;
       }
-      prevItem = this.state.listMap[orderItem.id];
+      prevItem = currentItem;
 
-      if (orderItem.subItems.length) {
+      if (orderItem.subItems.length && !currentItem.collapsed) {
         const childItem = this.getPreviousItemRecursive(item, orderItem.subItems, targetItem, recursiveCount + 1);
         if (childItem) {
           prevItem = childItem;

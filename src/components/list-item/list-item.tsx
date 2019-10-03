@@ -15,13 +15,23 @@ export type ListItemProps = {
 }
 
 export class ListItem extends React.Component<ListItemProps> {
-  render() {
-    let liClassName = this.props.className || 'list-item';
-    if (this.props.focused) {
-      liClassName += ' focused';
-    }
+  liRef: React.RefObject<HTMLLIElement>
 
-    return <li className={liClassName} tabIndex={0}>
+  constructor(props: ListItemProps) {
+    super(props);
+
+    this.liRef = React.createRef();
+  }
+
+  render() {
+    const classNames = this.getClassNames(this.props.className || 'list-item');
+
+    if (this.props.focused) {
+      this.liRef.current && this.liRef.current.focus();
+    }
+    const tabIndex = this.props.focused ? 0 : -1;
+
+    return <li className={classNames} tabIndex={tabIndex} ref={this.liRef}>
       <span>
         {this.props.label}
         {this.createExpandMarker()}
@@ -31,15 +41,13 @@ export class ListItem extends React.Component<ListItemProps> {
   }
 
   createExpandMarker(): JSX.Element | undefined {
-    let imgClassNames = this.getImageClassNames();
-
     return this.props.subItems.length ?
-      <img src={triangle} className={imgClassNames}></img>
+      <img src={triangle}></img>
       : undefined;
   }
 
-  getImageClassNames(): string {
-    const classNames = [];
+  getClassNames(className?: string): string {
+    const classNames = className ? [className] : [];
     if (this.props.collapsed) {
       classNames.push('collapsed');
     }
@@ -51,6 +59,10 @@ export class ListItem extends React.Component<ListItemProps> {
   }
 
   createSubItems(): JSX.Element | undefined {
+    if (this.props.collapsed) {
+      return;
+    }
+
     return this.props.subItems && (
       <TreeList
         listMap={this.props.listMap}
