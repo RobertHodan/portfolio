@@ -15,6 +15,10 @@ const data = [
       {
         id: getNextUniqueId(),
         label: 'Dogget',
+      },
+      {
+        id: getNextUniqueId(),
+        label: 'Dogget doggy',
       }
     ],
   }, {

@@ -9,11 +9,20 @@ export type TreeListItem = {
 }
 
 export interface TreeListControllerProps extends TreeListProps {
+  // Nested array of TreeListItem's
   list: TreeListItem[],
-  // if an item is selected, but it belongs to a collapsed parent, then show that parent as selected instead
-  selectParentIfCollapsed: boolean,
+  // If an item is selected, but it belongs to a collapsed parent, then show that parent as selected instead
+  selectNearestParent: boolean,
   // If the end of the list is reached, roll over to the other side
   rollover: boolean,
+  // Number in ms, determines if consecutive key inputs should be contactinated together into a string
+  // before searching for which item to focus
+  //
+  // 0  = Will only search one letter at a time, no chaining.
+  inputChainThreshold: number,
+  // Treats a duplicate character as one single character. Eg. 'dd' will become 'd'
+  // Used to make functionality a little more responsive
+  inputChainTreatDoubleCharAsSingle: boolean,
 };
 
 export interface TreeListControllerState {
@@ -43,18 +52,26 @@ export enum TreeListControllerEventNames {
   ToggleItem,
   FirstItem,
   LastItem,
+  ToggleItemOrKeyPress,
 }
 
 export class TreeListController extends React.Component<TreeListControllerProps, TreeListControllerState> {
   static defaultProps = {
     rollover: true,
+    inputChainThreshold: 500,
+    inputChainTreatDoubleCharAsSingle: true,
   }
 
   eventBindings: {
     [key: number]: string[],
   }
 
-  focusedId?: string
+  focusedId?: string;
+  // String of characters that will be used to match items
+  keyString: string;
+
+  // Timeout that resets keyString
+  keyTimeout?: number;
 
   constructor(props: TreeListControllerProps) {
     super(props);
@@ -83,16 +100,22 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       [e.NextItem]: ['ArrowDown'],
       [e.StepOut]: ['ArrowLeft'],
       [e.StepIn]: ['ArrowRight'],
-      [e.ToggleItem]: [' ', 'Enter'],
+      [e.ToggleItem]: ['Enter'],
       [e.FirstItem]: ['Home'],
       [e.LastItem]: ['End'],
+      // Space can be either Toggle Item, or a normal key press (when labels have spaces in them)
+      [e.ToggleItemOrKeyPress]: [' '],
     };
+
+    this.keyString = '';
   }
 
   handleOnKeyDown = (event: React.KeyboardEvent) => {
     const eventName = this.getFirstEventName(event.key);
     if (typeof(eventName) === 'number') {
-      this.handleEvent(eventName);
+      this.handleEvent(eventName, event.key);
+    } else {
+      this.focusItemByChar(event.key);
     }
   }
 
@@ -116,7 +139,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     });
   }
 
-  handleEvent(eventName: number) {
+  handleEvent(eventName: number, key: string) {
     const eventNames = TreeListControllerEventNames;
     switch(eventName) {
       case eventNames.PrevItem:
@@ -137,7 +160,122 @@ export class TreeListController extends React.Component<TreeListControllerProps,
         break;
       case eventNames.LastItem:
         break;
+      case eventNames.ToggleItemOrKeyPress:
+        this.toggleItemOrKeyPress(key);
+        break;
     }
+  }
+
+  toggleItemOrKeyPress(key: string) {
+    if (this.keyString.length === 0) {
+
+    } else {
+      this.focusItemByChar(key);
+    }
+  }
+
+  focusItemByChar(key: string) {
+    if (key.length !== 1) {
+      return;
+    }
+
+    const keyString = this.addToKeyString(key);
+    this.focusItemByString(keyString);
+  }
+
+  focusItemByString(str: string) {
+    const focusedItem = this.getFocusedItem();
+    const item = this.getNextItemByStringRecursive(focusedItem, str, str.length !== 1, true);
+
+    if (item) {
+      this.focusItem(item, focusedItem);
+    }
+  }
+
+  getNextItemByStringRecursive(
+    item: TreeListMapItem,
+    str: string,
+    // Include the passed in item in the search
+    includeGivenItem?: boolean,
+    includeGivenItemChildren?: boolean,
+    abort?: {
+      item: TreeListMapItem,
+      abortAll?: boolean,
+    },
+  ): TreeListMapItem | undefined {
+    const lowerStr = str.toLocaleLowerCase();
+    const siblings = this.getSiblingIds(item);
+    const index = this.getItemIndex(item, siblings);
+    const map = this.state.listMap;
+    let matchedItem;
+
+    for (let i = index; i < siblings.length; i++) {
+      const nextItem = map[ siblings[i] ];
+      const nextLabel = nextItem.label.toLocaleLowerCase();
+      if (abort && (abort.abortAll || nextItem === abort.item)) {
+        abort.abortAll = true;
+        break;
+      }
+
+      // Check current item
+      if (nextLabel.indexOf(lowerStr) === 0 &&
+        (i !== index || includeGivenItem)
+      ) {
+        matchedItem = nextItem;
+        break;
+      }
+
+      // Check children of current item
+      const firstChild = this.getChildItemByIndex(nextItem, 0);
+      if (firstChild &&
+          (i !== index || includeGivenItemChildren)
+        ) {
+        matchedItem = this.getNextItemByStringRecursive(firstChild, str, true, true, abort);
+        if (matchedItem) {
+          break;
+        }
+      }
+    }
+
+    if (abort && abort.abortAll) {
+      return matchedItem;
+    }
+
+    // Check next parent of current item
+    if (!matchedItem && item.parentId) {
+      const parent = map[item.parentId];
+      matchedItem = this.getNextItemByStringRecursive(parent, str, false, false, abort);
+    }
+
+    // Rollover to beginning
+    if (!matchedItem) {
+      const firstItem = map[ this.state.rootIds[0] ];
+      matchedItem = this.getNextItemByStringRecursive(firstItem, str, true, true, { item: item });
+    }
+
+    return matchedItem;
+  }
+
+  addToKeyString(key: string): string {
+    // If there's no threshold, always return back the most recent key pressed
+    if (!this.props.inputChainThreshold) {
+      return key;
+    }
+
+    if (this.keyTimeout) {
+      window.clearTimeout(this.keyTimeout);
+    }
+    this.keyTimeout = window.setTimeout(() => {
+      this.keyString = '';
+    }, this.props.inputChainThreshold);
+
+    this.keyString += key;
+    if (this.props.inputChainTreatDoubleCharAsSingle && this.keyString.length == 2) {
+      if (this.keyString[0] === this.keyString[1]) {
+        return this.keyString = this.keyString[0];
+      }
+    }
+    return this.keyString;
   }
 
   stepIntoOrExpand() {
@@ -239,6 +377,10 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   getChildItemByIndex(item: TreeListMapItem, index: number): TreeListMapItem | undefined {
+    if (item.collapsed) {
+      return;
+    }
+
     return this.state.listMap[ item.childIds[ index ] ];
   }
 
