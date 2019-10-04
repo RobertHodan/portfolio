@@ -9,7 +9,7 @@ export interface TreeListItemProps extends ListItemProps {
 
 export type TreeListProps = {
   listMap: TreeListMap,
-  listOrder: TreeListOrder[],
+  listOrder: string[],
   className?: string,
   onKeyDown?: (event: React.KeyboardEvent<HTMLUListElement>) => void,
 };
@@ -27,13 +27,13 @@ export class TreeList extends React.Component<TreeListProps> {
     );
   }
 
-  createItems(list: TreeListOrder[]): JSX.Element[] {
-    return list.map(((orderItem: TreeListOrder) => {
-      const item = this.props.listMap[orderItem.id];
+  createItems(listIds: string[]): JSX.Element[] {
+    return listIds.map(((id: string) => {
+      const item = this.props.listMap[id];
 
       return <ListItem
         listMap={this.props.listMap}
-        subItems={orderItem.subItems}
+        subItemIds={item.childIds}
         key={item.id}
         {...item}
       />

@@ -7,7 +7,7 @@ import { TreeListMap, TreeListOrder } from '../tree-list-controller/tree-list-co
 export type ListItemProps = {
   label: string,
   listMap: TreeListMap,
-  subItems: TreeListOrder[],
+  subItemIds: string[],
   className?: string,
   collapsed?: boolean,
   selected?: boolean,
@@ -41,7 +41,7 @@ export class ListItem extends React.Component<ListItemProps> {
   }
 
   createExpandMarker(): JSX.Element | undefined {
-    return this.props.subItems.length ?
+    return this.props.subItemIds.length ?
       <img src={triangle}></img>
       : undefined;
   }
@@ -63,10 +63,10 @@ export class ListItem extends React.Component<ListItemProps> {
       return;
     }
 
-    return this.props.subItems && (
+    return this.props.subItemIds && (
       <TreeList
         listMap={this.props.listMap}
-        listOrder={this.props.subItems}
+        listOrder={this.props.subItemIds}
       />
     )
   }

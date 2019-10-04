@@ -20,6 +20,22 @@ const data = [
   }, {
     id: getNextUniqueId(),
     label: 'Cat',
+    subItems: [
+      {
+        id: getNextUniqueId(),
+        label: 'Catette',
+      },
+      {
+        id: getNextUniqueId(),
+        label: 'Kitter',
+        subItems: [
+          {
+            id: getNextUniqueId(),
+            label: 'Kitty',
+          },
+        ],
+      },
+    ]
   }
 ]
 
