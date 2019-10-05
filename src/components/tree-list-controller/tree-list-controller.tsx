@@ -67,6 +67,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   focusedId?: string;
+  selectedId?: string;
   // String of characters that will be used to match items
   keyString: string;
 
@@ -155,10 +156,15 @@ export class TreeListController extends React.Component<TreeListControllerProps,
         this.stepIntoOrExpand();
         break;
       case eventNames.ToggleItem:
+        this.selectFocusedItem();
         break;
       case eventNames.FirstItem:
+        const firstItem = this.state.listMap[ this.state.rootIds[0] ];
+        this.focusItem(firstItem);
         break;
       case eventNames.LastItem:
+        const lastItem = this.getLastItem();
+        this.focusItem(lastItem);
         break;
       case eventNames.ToggleItemOrKeyPress:
         this.toggleItemOrKeyPress(key);
@@ -336,6 +342,35 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     });
   }
 
+  selectFocusedItem() {
+    const focusedItem = this.getFocusedItem();
+    this.selectItem(focusedItem);
+  }
+
+  selectItem(newItem: TreeListMapItem, prevItem: TreeListMapItem | undefined = this.getSelectedItem()) {
+    const modifiedItems = {
+      [newItem.id]: {
+        $merge: {
+          selected: true,
+        },
+      },
+    };
+
+    if (prevItem) {
+      modifiedItems[prevItem.id] = {
+        $merge: {
+          selected: false,
+        },
+      };
+    }
+    const newListMap = update(this.state.listMap, modifiedItems);
+
+    this.selectedId = newItem.id;
+    this.setState({
+      listMap: newListMap
+    });
+  }
+
   focusNextItem() {
     const focusedItem = this.getFocusedItem();
     const nextItem = this.getNextItem(focusedItem);
@@ -382,6 +417,10 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     }
 
     return this.state.listMap[ item.childIds[ index ] ];
+  }
+
+  getSelectedItem(): TreeListMapItem | undefined {
+    return this.selectedId ? this.state.listMap[this.selectedId] : undefined;
   }
 
   getFocusedItem(): TreeListMapItem {
