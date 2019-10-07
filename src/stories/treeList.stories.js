@@ -40,40 +40,6 @@ const data = [
   },
   {
     id: getNextUniqueId(),
-    label: 'Deep nesting',
-    subItems: [
-      {
-        id: getNextUniqueId(),
-        label: 'Doggo',
-        subItems: [
-          {
-            id: getNextUniqueId(),
-            label: 'Dogget',
-            subItems: [
-              {
-                id: getNextUniqueId(),
-                label: 'Doggy',
-              },
-              {
-                id: getNextUniqueId(),
-                label: 'Doggy',
-              },
-            ]
-          },
-          {
-            id: getNextUniqueId(),
-            label: 'Dogget',
-          },
-        ]
-      },
-      {
-        id: getNextUniqueId(),
-        label: 'Doggo',
-      },
-    ]
-  },
-  {
-    id: getNextUniqueId(),
     label: 'Conclusion',
   }
 ]
