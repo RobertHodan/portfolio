@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListItemProps, ListItem } from '../list-item/list-item';
 import './tree-list.scss';
-import { TreeListOrder, TreeListMap } from '../tree-list-controller/tree-list-controller';
+import { TreeListMap } from '../tree-list-controller/tree-list-controller';
 
 export interface TreeListItemProps extends ListItemProps {
   id: string,
@@ -12,6 +12,8 @@ export type TreeListProps = {
   listOrder: string[],
   className?: string,
   onKeyDown?: (event: React.KeyboardEvent<HTMLUListElement>) => void,
+  onItemSelect?: (id: string) => void,
+  onItemClick?: (id: string) => void,
 };
 
 export class TreeList extends React.Component<TreeListProps> {
@@ -32,9 +34,11 @@ export class TreeList extends React.Component<TreeListProps> {
       const item = this.props.listMap[id];
 
       return <ListItem
-        listMap={this.props.listMap}
-        subItemIds={item.childIds}
-        key={item.id}
+        listMap={ this.props.listMap }
+        subItemIds={ item.childIds }
+        key={ item.id }
+        onSelect={ this.props.onItemSelect }
+        onClick={ this.props.onItemClick }
         {...item}
       />
     }

@@ -12,9 +12,10 @@
     display: inline;
   }
 
-  div {
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+  span {
+    display: inline-block;
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
   }
 
   &.has-children {
@@ -44,9 +45,10 @@
     color: #E1E1E1;
     font-weight: 400;
 
-    > div {
-      padding-bottom: 0.7em;
-      padding-top: 0.7em;
+    > div span {
+      display: inline-block;
+      padding-bottom: 0.8em;
+      padding-top: 0.8em;
     }
   }
 

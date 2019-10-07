@@ -1,7 +1,7 @@
 import React from 'react';
-import { TreeList } from '../components/tree-list/tree-list';
 import { getNextUniqueId } from '../utils/utils';
 import { TreeListController } from '../components/tree-list-controller/tree-list-controller';
+import 'normalize.css';
 
 export default {
   title: 'Tree List',
@@ -10,36 +10,71 @@ export default {
 const data = [
   {
     id: getNextUniqueId(),
-    label: 'Doggo',
+    label: 'Overview',
+  }, {
+    id: getNextUniqueId(),
+    label: 'Mockup',
     subItems: [
       {
         id: getNextUniqueId(),
-        label: 'Dogget',
+        label: 'Grid View',
       },
       {
         id: getNextUniqueId(),
-        label: 'Dogget doggy',
+        label: 'Main Menu',
       }
     ],
   }, {
     id: getNextUniqueId(),
-    label: 'Cat',
+    label: 'Development',
     subItems: [
       {
         id: getNextUniqueId(),
-        label: 'Catette',
+        label: 'Tree List',
       },
       {
         id: getNextUniqueId(),
-        label: 'Kitter',
+        label: 'Main Menu',
+      },
+    ]
+  },
+  {
+    id: getNextUniqueId(),
+    label: 'Deep nesting',
+    subItems: [
+      {
+        id: getNextUniqueId(),
+        label: 'Doggo',
         subItems: [
           {
             id: getNextUniqueId(),
-            label: 'Kitty',
+            label: 'Dogget',
+            subItems: [
+              {
+                id: getNextUniqueId(),
+                label: 'Doggy',
+              },
+              {
+                id: getNextUniqueId(),
+                label: 'Doggy',
+              },
+            ]
           },
-        ],
+          {
+            id: getNextUniqueId(),
+            label: 'Dogget',
+          },
+        ]
+      },
+      {
+        id: getNextUniqueId(),
+        label: 'Doggo',
       },
     ]
+  },
+  {
+    id: getNextUniqueId(),
+    label: 'Conclusion',
   }
 ]
 
