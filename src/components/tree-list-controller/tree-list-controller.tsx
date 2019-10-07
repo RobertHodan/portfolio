@@ -55,6 +55,8 @@ export enum TreeListControllerEventNames {
   FirstItem,
   LastItem,
   ToggleItemOrKeyPress,
+  expandSiblings,
+  collapseSiblings,
 }
 
 export class TreeListController extends React.Component<TreeListControllerProps, TreeListControllerState> {
@@ -109,6 +111,8 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       [e.LastItem]: ['End'],
       // Space can be either Toggle Item, or a normal key press (when labels have spaces in them)
       [e.ToggleItemOrKeyPress]: [' '],
+      [e.expandSiblings]: ['*'],
+      [e.collapseSiblings]: ['/'],
     };
 
     this.keyString = '';
@@ -156,7 +160,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     );
   }
 
-  updateTreeListMapItem(id: string, itemModifications: Partial<TreeListMapItem>) {
+  updateItem(id: string, itemModifications: Partial<TreeListMapItem>) {
     const modifiedItems = {
       [id]: {
         $merge: itemModifications,
@@ -222,6 +226,12 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       case eventNames.ToggleItemOrKeyPress:
         this.toggleItemOrKeyPress(key);
         break;
+      case eventNames.expandSiblings:
+        this.expandFocusedSiblings();
+        break;
+      case eventNames.collapseSiblings:
+        this.collapseFocusedSiblings();
+        break;
     }
   }
 
@@ -231,6 +241,15 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     } else {
       this.focusItemByChar(key);
     }
+  }
+
+  expandFocusedSiblings() {
+    this.collapseFocusedSiblings(false);
+  }
+
+  collapseFocusedSiblings(shouldCollapse: boolean = true) {
+    const focusedItem = this.getFocusedItem();
+    this.updateSiblings(focusedItem, { collapsed: shouldCollapse });
   }
 
   focusItemByChar(key: string) {
@@ -382,7 +401,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   collapseItem(item: TreeListMapItem, isCollapsed: boolean) {
-    this.updateTreeListMapItem(item.id, { collapsed: isCollapsed });
+    this.updateItem(item.id, { collapsed: isCollapsed });
     if (this.props.selectNearestParent && item.childSelected) {
       this.selectItem(item, isCollapsed, false);
     }
@@ -405,12 +424,12 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   ) {
     if (selectedItems && deselectPreviousSelections) {
       selectedItems.forEach((item: TreeListMapItem) => {
-          this.updateTreeListMapItem(item.id, { selected: false });
+          this.updateItem(item.id, { selected: false });
           this.updateParentRecursive(item, { childSelected: false });
       });
     }
 
-    this.updateTreeListMapItem(newItem.id, { selected: state });
+    this.updateItem(newItem.id, { selected: state });
     this.updateParentRecursive(newItem, { childSelected: true });
     this.selectedIds.push(newItem.id);
   }
@@ -418,9 +437,16 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   updateParentRecursive(item: TreeListMapItem, updatedDetails: Partial<TreeListMapItem>) {
     if (item.parentId) {
       const parent = this.getItem(item.parentId);
-      this.updateTreeListMapItem(parent.id, updatedDetails);
+      this.updateItem(parent.id, updatedDetails);
       this.updateParentRecursive(parent, updatedDetails);
     }
+  }
+
+  updateSiblings(item: TreeListMapItem, updatedDetails: Partial<TreeListMapItem>) {
+    const siblingIds = this.getSiblingIds(item);
+    siblingIds.forEach((id: string) => {
+      this.updateItem(id, updatedDetails);
+    });
   }
 
   focusNextItem() {
@@ -444,9 +470,9 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   focusItem(newItem: TreeListMapItem, state: boolean = true, prevItem: TreeListMapItem = this.getFocusedItem()) {
-    this.updateTreeListMapItem(newItem.id, { focused: state });
+    this.updateItem(newItem.id, { focused: state });
     if (prevItem && prevItem !== newItem) {
-      this.updateTreeListMapItem(prevItem.id, { focused: false });
+      this.updateItem(prevItem.id, { focused: false });
     }
 
     this.focusedId = newItem.id;
