@@ -1,5 +1,5 @@
 import React from 'react';
-import { getNextUniqueId } from '../utils/utils';
+import { getNextUniqueId, flattenList } from '../utils/utils';
 import { TreeListController } from '../components/tree-list-controller/tree-list-controller';
 import 'normalize.css';
 
@@ -44,8 +44,11 @@ const data = [
   }
 ]
 
+const [list, rootIds] = flattenList(data);
+
 export const List = () => (
   <TreeListController
-    list={ data }
+    listMap={ list }
+    rootIds={ rootIds }
   ></TreeListController>
 );

@@ -14,6 +14,7 @@ export type TreeListProps = {
   onKeyDown?: (event: React.KeyboardEvent<HTMLUListElement>) => void,
   onItemSelect?: (id: string) => void,
   onItemClick?: (id: string) => void,
+  role?: string,
 };
 
 export class TreeList extends React.Component<TreeListProps> {
@@ -23,6 +24,7 @@ export class TreeList extends React.Component<TreeListProps> {
       <ul
         className={ this.props.className || 'tree-list' }
         onKeyDown={ this.props.onKeyDown }
+        role={ this.props.role || 'tree' }
       >
         {this.createItems(this.props.listOrder)}
       </ul>

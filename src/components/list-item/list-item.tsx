@@ -46,16 +46,27 @@ export class ListItem extends React.Component<ListItemProps> {
       this.liRef.current && this.liRef.current.focus();
     }
     const tabIndex = this.props.focused ? 0 : -1;
+    // Return undefined if it has no children, so that 'aria-expanded' is never added
+    // This attribute should only be added to items that can actually expand
+    const isExpanded = this.props.subItemIds.length ? !this.props.collapsed : undefined;
 
-    return <li className={classNames} tabIndex={tabIndex} ref={this.liRef}>
-      <div onClick={ this.handleOnClick }>
-        <span className="collapse-icon-container" onClick={ this.handleOnSelect }>
-          {this.props.label}
-        </span>
-        {this.createExpandMarker()}
-      </div>
-      {this.createSubItems()}
-    </li>
+    return (
+      <li
+        className={classNames}
+        tabIndex={tabIndex}
+        ref={this.liRef}
+        role={'treeitem'}
+        aria-expanded={isExpanded}
+      >
+        <div onClick={ this.handleOnClick }>
+          <span className="collapse-icon-container" onClick={ this.handleOnSelect }>
+            {this.props.label}
+          </span>
+          {this.createExpandMarker()}
+        </div>
+        {this.createSubItems()}
+      </li>
+    )
   }
 
   createExpandMarker(): JSX.Element | undefined {
@@ -93,6 +104,7 @@ export class ListItem extends React.Component<ListItemProps> {
         listOrder={this.props.subItemIds}
         onItemSelect={ this.props.onSelect }
         onItemClick={ this.props.onClick }
+        role={'group'}
       />
     ) : undefined;
   }
