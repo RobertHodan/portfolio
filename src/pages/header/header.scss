@@ -1,0 +1,41 @@
+@import '../../colors.scss';
+
+.header {
+  position: fixed;
+  width: 100%;
+  font-family: 'Vollkorn', serif;
+  background: $background-color-primary;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: $text-color-primary;
+
+  h1 {
+    font-size: 1.286em;
+  }
+
+  .spacing-div, .header-nav {
+    width: 30em;
+  }
+
+  .header-nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+  }
+
+  .list-item {
+    color: $text-color-primary;
+    height: 3em;
+    display: flex;
+    align-items: center;
+    place-content: center;
+    height: 4.5rem;
+    flex-grow: 1;
+
+    &.selected {
+      border-bottom: 0.2em solid $highlight-color-primary;
+    }
+  }
+}

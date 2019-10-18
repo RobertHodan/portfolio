@@ -1,0 +1,15 @@
+@import '../../colors.scss';
+
+.radio-indicator {
+  width: 0.9em;
+  height: 0.9em;
+  background: $background-color-primary;
+  border-radius: 50%;
+  border: 0.1em solid $background-color-primary;
+}
+
+.selected {
+  .radio-indicator {
+    background: $background-color-third;
+  }
+}

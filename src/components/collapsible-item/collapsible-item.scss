@@ -1,0 +1,48 @@
+.collapsible-item {
+  &.has-children {
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  span {
+    display: inline-block;
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+  }
+
+  &.selected {
+    > div span {
+      display: inline-block;
+      padding-bottom: 0.8em;
+      padding-top: 0.8em;
+    }
+  }
+
+  &:focus {
+    > div {
+      border: 1px solid gray;
+    }
+  }
+
+  img {
+    float: right;
+  }
+
+  > ul {
+    border-top: 1px solid #373737;
+    padding: 0 0 0 1em;
+  }
+
+  &.collapse-icon-container {
+    display: inline;
+  }
+
+  &.collapsed {
+    img {
+      transform: rotate(90deg);
+    }
+  }
+}

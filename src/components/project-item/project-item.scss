@@ -1,0 +1,57 @@
+@import '../../colors.scss';
+
+.project-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $border-color-primary;
+  padding: 10em 5em;
+  flex-wrap: wrap;
+
+  img {
+    max-width: 675px;
+    max-height: 422px;
+    width: 100%;
+    height: auto;
+    background: #C4C4C4;
+  }
+
+  .project-details {
+    border-left: 0.4em solid $highlight-color-primary;
+    padding: 0.5em 0;
+    padding-left: 2em;
+
+    h1 {
+      font-family: 'Vollkorn', serif;
+      font-size: 20px;
+      margin: 0;
+      line-height: 1em;
+      font-weight: 600;
+    }
+
+    h2 {
+      color: $text-color-secondary;
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 400;
+      margin: 0;
+      letter-spacing: 0.10em;
+      line-height: 1em;
+      margin-top: 0.4em;
+      margin-bottom: 3em;
+    }
+
+    p {
+      color: $text-color-secondary;
+      max-width: 42em;
+      font-size: 15px;
+      margin: 0;
+      letter-spacing: 0.05em;
+      text-align: justify;
+    }
+  }
+
+  &:nth-child(odd) {
+    flex-direction: row-reverse;
+  }
+}

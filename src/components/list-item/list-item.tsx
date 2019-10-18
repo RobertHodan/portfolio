@@ -1,23 +1,27 @@
 import React from 'react';
-import { TreeList, TreeListItemProps } from '../tree-list/tree-list';
 import './list-item.scss';
-import triangle from './svgs/triangle.svg';
 import { TreeListMap } from '../tree-list-controller/tree-list-controller';
+import { ListMap } from '../list/list';
+import { CollapsibleItem } from '../collapsible-item/collapsible-item';
+import { SimpleLabel } from '../simple-item/simple-item';
 
 export type ListItemProps = {
   id: string,
-  label: string,
-  listMap: TreeListMap,
-  subItemIds: string[],
+  label?: string,
   className?: string,
-  collapsed?: boolean,
   selected?: boolean,
   focused?: boolean,
-  onSelect?: (id: string) => void,
-  onClick?: (id: string) => void,
+  tabIndex?: number,
+  role?: string,
+  ariaExpanded?: boolean,
+  onClick?: (props: ListItemProps, event: React.MouseEvent) => void,
+  functionItem?: (props: ListItemProps) => React.ReactNode,
 }
 
 export class ListItem extends React.Component<ListItemProps> {
+  static defaultProps: {
+    tabIndex: 0,
+  }
   liRef: React.RefObject<HTMLLIElement>
 
   constructor(props: ListItemProps) {
@@ -26,86 +30,59 @@ export class ListItem extends React.Component<ListItemProps> {
     this.liRef = React.createRef();
   }
 
-  handleOnSelect = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    if (this.props.onSelect) {
-      this.props.onSelect(this.props.id);
-      event.preventDefault();
-    }
-  }
-
-  handleOnClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (this.props.onClick && !event.defaultPrevented) {
-      this.props.onClick(this.props.id);
+  handleOnClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    if (this.props.onClick) {
+      this.props.onClick(this.props, event);
     }
   }
 
   render() {
+    const { focused, tabIndex, role, ariaExpanded } = this.props;
     const classNames = this.getClassNames(this.props.className || 'list-item');
 
-    if (this.props.focused) {
+    if (focused) {
       this.liRef.current && this.liRef.current.focus();
     }
-    const tabIndex = this.props.focused ? 0 : -1;
-    // Return undefined if it has no children, so that 'aria-expanded' is never added
-    // This attribute should only be added to items that can actually expand
-    const isExpanded = this.props.subItemIds.length ? !this.props.collapsed : undefined;
 
     return (
       <li
         className={classNames}
-        tabIndex={tabIndex}
         ref={this.liRef}
-        role={'treeitem'}
-        aria-expanded={isExpanded}
+        onClick={this.handleOnClick}
+        tabIndex={tabIndex}
+        role={role}
+        aria-expanded={ariaExpanded}
       >
-        <div onClick={ this.handleOnClick }>
-          <span className="collapse-icon-container" onClick={ this.handleOnSelect }>
-            {this.props.label}
-          </span>
-          {this.createExpandMarker()}
-        </div>
-        {this.createSubItems()}
+        {this.getItemContent()}
       </li>
     )
   }
 
-  createExpandMarker(): JSX.Element | undefined {
-    return this.props.subItemIds.length ? (
-        <img src={triangle}></img>
-      )
-      : undefined;
+  getItemContent() {
+    const {functionItem, children} = this.props;
+
+    // Check for custom children
+    if (functionItem) {
+      return functionItem(this.props);
+    }
+
+    if (children) {
+      return children;
+    }
+
+    return (
+      <SimpleLabel
+        {...this.props}
+      ></SimpleLabel>
+    );
   }
 
   getClassNames(className?: string): string {
     const classNames = className ? [className] : [];
-    if (this.props.collapsed) {
-      classNames.push('collapsed');
-    } else {
-      classNames.push('expanded');
-    }
     if (this.props.selected) {
       classNames.push('selected');
     }
-    if (this.props.subItemIds.length) {
-      classNames.push('has-children');
-    }
 
     return classNames.join(' ');
-  }
-
-  createSubItems(): JSX.Element | undefined {
-    if (this.props.collapsed) {
-      return;
-    }
-
-    return this.props.subItemIds.length ? (
-      <TreeList
-        listMap={this.props.listMap}
-        listOrder={this.props.subItemIds}
-        onItemSelect={ this.props.onSelect }
-        onItemClick={ this.props.onClick }
-        role={'group'}
-      />
-    ) : undefined;
   }
 }

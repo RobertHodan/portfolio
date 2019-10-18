@@ -1,0 +1,36 @@
+@import '../../colors.scss';
+
+.main-menu {
+  .landing-screen {
+    height: 90vh;
+    width: 100%;
+    display: flex;
+    margin-left: 5em;
+    align-items: flex-end;
+
+    .title {
+      border-left: 0.4em solid $highlight-color-primary;
+      padding: 0.5em 2.6em;
+      margin-bottom: 6em;
+    }
+
+    h1 {
+      font-family: 'Vollkorn', serif;
+      font-size: 72px;
+      margin: 0;
+      line-height: 1em;
+      font-weight: 300;
+    }
+
+    h2 {
+      color: $text-color-secondary;
+      text-transform: uppercase;
+      font-size: 24px;
+      font-weight: 400;
+      margin: 0;
+      letter-spacing: 0.12em;
+      line-height: 1em;
+      margin-top: 0.4em;
+    }
+  }
+}

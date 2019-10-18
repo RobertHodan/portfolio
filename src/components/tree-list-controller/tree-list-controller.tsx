@@ -4,7 +4,7 @@ import { TreeListItemProps, TreeListProps, TreeList } from '../tree-list/tree-li
 
 export type TreeListItem = {
   id: string,
-  label: string,
+  label?: string,
   subItems: TreeListItem[],
 }
 
@@ -32,7 +32,7 @@ export interface TreeListControllerState {
 
 export type TreeListMapItem = {
   id: string,
-  label: string,
+  label?: string,
   parentId?: string,
   childIds: string[],
   selected?: boolean,
@@ -46,17 +46,17 @@ export type TreeListMap = {
   [id: string]: TreeListMapItem,
 }
 
-export enum TreeListControllerEventNames {
-  PrevItem,
-  NextItem,
-  StepOut,
-  StepIn,
-  ToggleItem,
-  FirstItem,
-  LastItem,
-  ToggleItemOrKeyPress,
-  expandSiblings,
-  collapseSiblings,
+export const TreeListControllerEventNames = {
+  PrevItem: 'PREVITEM',
+  NextItem: 'NEXTITEM',
+  StepOut: 'STEPOUT',
+  StepIn: 'STEPIN',
+  ToggleItem: 'TOGGLEITEM',
+  FirstItem: 'FIRSTITEM',
+  LastItem: 'LASTITEM',
+  ToggleItemOrKeyPress: 'TOGGLEITEMORKEYPRESS',
+  expandSiblings: 'EXPANDSIBLINGS',
+  collapseSiblings: 'COLLAPSESIBLINGS',
 }
 
 export class TreeListController extends React.Component<TreeListControllerProps, TreeListControllerState> {
@@ -68,7 +68,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   eventBindings: {
-    [key: number]: string[],
+    [key: string]: string[],
   }
 
   focusedId?: string;
@@ -120,23 +120,23 @@ export class TreeListController extends React.Component<TreeListControllerProps,
 
   handleOnKeyDown = (event: React.KeyboardEvent) => {
     const eventName = this.getFirstEventName(event.key);
-    if (typeof(eventName) === 'number') {
+    if (eventName) {
       this.handleEvent(eventName, event.key);
     } else {
       this.focusItemByChar(event.key);
     }
   }
 
-  handleItemSelect = (itemId: string) => {
-    const item = this.getItemById(itemId);
+  handleLabelClick = (props: TreeListItemProps) => {
+    const item = this.getItemById(props.id);
     if (item) {
       this.focusItem(item);
       this.selectItem(item);
     }
   }
 
-  handleItemClick = (itemId: string) => {
-    const item = this.getItemById(itemId);
+  handleItemClick = (props: TreeListItemProps) => {
+    const item = this.getItemById(props.id);
     if (item) {
       this.focusItem(item);
       this.collapseItem(item, !item.collapsed);
@@ -153,7 +153,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
         listMap={ listMap }
         listOrder={ rootIds }
         onKeyDown={ this.handleOnKeyDown }
-        onItemSelect={ this.handleItemSelect }
+        onLabelClick={ this.handleLabelClick }
         onItemClick={ this.handleItemClick }
       />
     );
@@ -175,9 +175,9 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   // Assumes no two events will share the same key
-  getFirstEventName(key: string): number | undefined {
-    const keys = Object.keys(this.eventBindings).map((key) => parseInt(key));
-    return keys.find((action) => {
+  getFirstEventName(key: string): string | undefined {
+    const keys = Object.keys(this.eventBindings);
+    return keys.find((action: string) => {
       return this.eventBindings[action].includes(key);
     });
   }
@@ -186,7 +186,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     return this.state.listMap[id];
   }
 
-  handleEvent(eventName: number, key: string) {
+  handleEvent(eventName: string, key: string) {
     const eventNames = TreeListControllerEventNames;
     switch(eventName) {
       case eventNames.PrevItem:
@@ -284,7 +284,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
   }
 
   itemLabelStartsWith(item: TreeListMapItem, str: string): boolean {
-    if (!str.length) {
+    if (!str.length || !item.label) {
       return false;
     }
 

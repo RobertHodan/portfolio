@@ -1,19 +1,32 @@
 import { TreeListItem, TreeListMap, TreeListMapItem } from "../components/tree-list-controller/tree-list-controller";
+import { ListMap, ListMapItem } from "../components/list/list";
 
 let id = 0;
 export function getNextUniqueId() {
     return `componentId-${id += 1}`;
 }
 
-export function flattenList(list: TreeListItem[]): [TreeListMap, string[]] {
+export function createMapFromList(list: TreeListItem[] | ListMapItem[]): [(TreeListMap | ListMap), string[]] {
     return flattenListRecursive(list);
+}
+
+export function createMapFromLabels(labels: string[]) {
+    const list = [];
+    for (const label of labels) {
+        list.push({
+            label: label,
+            id: getNextUniqueId(),
+        });
+    }
+
+    return createMapFromList(list);
 }
 
 // Separate an array of items into a flat hash map, and preserve the order through a TreeListOrder array
 //
 // "list" is the only parameter that should be passed in - everything else is used purely by the function itself
 function flattenListRecursive(
-    list: TreeListItem[],
+    list: TreeListItem[] | ListMapItem[],
     flatList: TreeListMap = {},
     parentId?: string,
     recursiveCount: number = 0,
@@ -34,11 +47,11 @@ for (const item of list) {
     flatList[item.id] = itemDetails;
     siblings.push(item.id);
 
-    if (item.subItems) {
-    rootParentId = (recursiveCount === 0) ? item.id : rootParentId;
-    // Add child items to the flatList, and also add their ids to the current item
-    const [flat, childIds] = flattenListRecursive(item.subItems, flatList, item.id, recursiveCount + 1, rootParentId);
-    itemDetails.childIds = childIds as string[];
+    if (item.hasOwnProperty('subItems')) {
+        rootParentId = (recursiveCount === 0) ? item.id : rootParentId;
+        // Add child items to the flatList, and also add their ids to the current item
+        const [flat, childIds] = flattenListRecursive((item as TreeListItem).subItems, flatList, item.id, recursiveCount + 1, rootParentId);
+        itemDetails.childIds = childIds as string[];
     }
 }
 
