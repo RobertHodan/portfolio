@@ -1,21 +1,26 @@
 import React from 'react';
+import './image.scss';
 
 export type ImageViewerProps = {
   src: string,
+  className?: string,
 }
 
 export class Image extends React.Component<ImageViewerProps> {
+  static defaultProps = {
+    className: 'image-container',
+  }
+
   render() {
-    let imgClass;
+    let { className } = this.props;
     if (this.props.src.includes('svg')) {
-      imgClass='is-svg';
+      className += ' is-svg';
     }
 
     return (
-      <div className={'image-container'}>
+      <div className={className}>
         <img
           src={this.props.src}
-          className={imgClass}
         ></img>
       </div>
     )

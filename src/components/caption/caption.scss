@@ -1,0 +1,10 @@
+@import '../../colors.scss';
+
+.caption {
+  margin: 0;
+
+  figcaption {
+    color: $text-color-secondary;
+    margin-top: 0.4em;
+  }
+}

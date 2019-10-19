@@ -5,15 +5,19 @@ import { List, ListMap, ListMapItem } from '../list/list';
 import { getNextUniqueId, createMapFromList } from '../../utils/utils';
 import { ListItemProps, ListItem } from '../list-item/list-item';
 import { RadioItem } from '../radio-item/radio-item';
+import { Button } from '../button/button';
+import { Modal } from '../modal/modal';
 
 export type ImageSliderProps = {
   className?: string,
   children: React.ReactNode,
-  style?: React.CSSProperties;
+  style?: React.CSSProperties,
+  disableModal?: boolean,
 }
 
 type ImageSliderState = {
   selectedIndex: number;
+  isModal: boolean;
 }
 
 export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderState> {
@@ -27,6 +31,7 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
 
     this.state = {
       selectedIndex: 0,
+      isModal: false,
     }
   }
 
@@ -59,8 +64,8 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
       }
       else if ((event.target as HTMLDivElement).className.includes('next')) {
         this.nextImage()
-      } else {
-
+      } else if (!this.state.isModal) {
+        this.toggleModal(true);
       }
     }
 
@@ -68,7 +73,20 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
       this.prevImage();
     } else if (event.key === 'ArrowRight') {
       this.nextImage();
+    } else if (event.key === 'Escape') {
+      this.toggleModal(false);
     }
+  }
+
+  toggleModal(isOpen: boolean = !this.state.isModal) {
+    // Leave modal creation until later
+    // Lots of work will be needed for this to work properly
+    return;
+    if (this.props.disableModal) {
+      return;
+    }
+
+    this.setState({isModal: isOpen})
   }
 
   nextImage() {
@@ -96,20 +114,40 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
   }
 
   render() {
-    let image = Array.isArray(this.props.children) ?
-      this.getImageByIndex(this.state.selectedIndex) :
-      this.props.children;
+    const { isModal } = this.state;
+    const content = this.createImageSliderContent();
+    const modal = isModal ? (
+      <Modal>
+        <ImageViewer
+          disableModal={ true }
+          {...this.props}
+        >
+        </ImageViewer>
+      </Modal>
+    ) : undefined;
 
+    return (
+      <>
+        <div
+          className={ this.props.className || 'image-slider' }
+          style={ this.props.style }
+          onClick={ this.handleOnClick }
+          onKeyDown={ this.handleOnKeyDown }
+          tabIndex={ 0 }
+        >
+          {content}
+        </div>
+        {modal}
+      </>
+    )
+  }
+
+  createImageSliderContent(): React.ReactNode {
+    let image = this.getImageByIndex(this.state.selectedIndex);
     let indicators = this.createIndicators();
 
     return (
-      <div
-        className={ this.props.className || 'image-slider' }
-        style={ this.props.style }
-        onClick={ this.handleOnClick }
-        onKeyDown={ this.handleOnKeyDown }
-        tabIndex={ 0 }
-      >
+      <>
         {this.getArrowButton('prev-image-btn', this.handlePrevButtonClick)}
         {this.getArrowButton('next-image-btn', this.handleNextButtonClick)}
         {indicators}
@@ -118,7 +156,7 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
         >
          {image}
         </ImageViewer>
-      </div>
+      </>
     )
   }
 
@@ -160,15 +198,19 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
 
   getArrowButton(className: string, onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void) {
     return (
-      <div className={`button ${className}`} role="button" onClick={onClick} tabIndex={0}>
+      <Button className={className} onClick={onClick}>
         <svg width="26" height="40" viewBox="0 0 26 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M23 3L5 20.3617L23 37" stroke="#AAAAAA" strokeWidth="6"/>
         </svg>
-      </div>
+      </Button>
     )
   }
 
   getImageByIndex(index: number) {
+    if (!Array.isArray(this.props.children)) {
+      return this.props.children;
+    }
+
     const image = this.props.children[index];
     if (!image) {
       console.error('No image found');

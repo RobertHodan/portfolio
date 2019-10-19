@@ -8,21 +8,5 @@
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
-    margin-right: 1em;
-    padding: 1em;
-    text-align: center;
-  }
-
-  .image-container:last-child {
-    margin-right: 0;
-  }
-
-  .is-svg {
-    height: 100%;
-  }
-
-  img {
-    max-height: 100%;
-    max-width: 100%;
   }
 }

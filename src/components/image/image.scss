@@ -1,0 +1,18 @@
+@import '../../colors.scss';
+
+.image-container {
+  margin: auto;
+  padding: 1em;
+  text-align: center;
+
+  &.is-svg {
+    > img {
+      height: 100%;
+    }
+  }
+
+  img {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}

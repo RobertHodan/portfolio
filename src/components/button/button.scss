@@ -1,0 +1,10 @@
+@import '../../colors.scss';
+
+.button {
+  cursor: pointer;
+  background: rgba(21, 21, 21, 0.75);
+
+  &:hover {
+    background: rgba(21, 21, 21, 0.9);
+  }
+}
