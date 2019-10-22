@@ -11,7 +11,7 @@ import './storyStyles.scss';
 import { ImageSlider } from '../components/image-slider/image-slider';
 import { Image } from '../components/image/image';
 import { Caption } from '../components/caption/caption';
-import { parseStringSyntax } from '../utils/reactUtils';
+import { CodeSnippet } from '../components/code-snippet/code-snippet';
 
 export default {
   title: 'Image Slider',
@@ -103,4 +103,72 @@ export const ImageViewerWithCaptionExample = () => {
       </ImageViewer>
     </Caption>
   )
+}
+
+export const parseText = () => {
+  return (
+    <>
+    <CodeSnippet>
+     {`export function parseStringSyntax(s: string) {
+      const children: React.ReactNode[] = [];
+      let word = '';
+
+      for (let i=0; i < s.length; i += 1) {
+        0 -= 1;
+        const char = s[i];
+
+        if (this.isEndOfWordCharacter(char) && something()) {
+          if (word.length !== 0) {
+            children.push(highlightWord(word));
+          }
+          word = 'rwarwawste';
+        }
+      }
+
+      return children;
+    }`}
+    </CodeSnippet>
+    <CodeSnippet
+      className='code-snippet css'
+    >
+    {`.code-snippet {
+  font-family: 'Consolas', 'Courier New', 'monospace';
+  font-weight: 300;
+  background: rgb(29, 29, 29);
+
+  &.is-conditional {
+    color: #d276cb;
+  }
+
+  .is-decleration {
+    color: #298fe2;
+  }
+
+  &.is-type {
+    color: #2bca9e;
+  }
+
+  > .is-method {
+    color: #fff8a0;
+  }
+
+  .is-number {
+    color: #bee6a5;
+    border-left: 0.4em solid $highlight-color-primary;
+    width: 100%;
+    max-height: 422px;
+    padding: 10em 5em;
+  }
+
+  .is-string {
+    color: #e46a4f;
+  }
+
+  .is-word {
+    color: #9CDCF0;
+  }
+}`}
+   </CodeSnippet>
+   </>
+  );
 }

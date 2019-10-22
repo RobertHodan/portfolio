@@ -1,0 +1,62 @@
+.code-snippet {
+  font-family: 'Consolas', 'Courier New', 'monospace';
+  font-weight: 300;
+  background: rgb(29, 29, 29);
+  color: #E1E1E1;
+
+  &.tsx {
+    .is-method {
+      color: #fff8a0;
+    }
+
+    .is-number {
+      color: #b6d8a1;
+    }
+
+    .is-string {
+      color: #de8470;
+    }
+
+    .is-word {
+      color: #9CDCF0;
+    }
+
+    .after-colon {
+      color: #2bca9e;
+    }
+
+    .is-conditional {
+      color: #d276cb;
+    }
+
+    .is-declaration {
+      color: #298fe2;
+    }
+  }
+
+  &.css {
+    .is-period, .after-period {
+      color: #efb46c;
+    }
+
+    .is-method {
+      color: #fff8a0;
+    }
+
+    .is-word {
+      color: #9CDCF0;
+    }
+
+    .is-number {
+      color: #b6d8a1;
+    }
+
+    .after-colon, .is-string {
+      color: #de8470;
+    }
+
+    .is-ampersand {
+      color: #549be4;
+    }
+  }
+}
