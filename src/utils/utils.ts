@@ -22,6 +22,24 @@ export function createMapFromLabels(labels: string[]) {
     return createMapFromList(list);
 }
 
+export function concatStringsUnique(s1: string, s2: string, splitter: string = ' ') {
+    if (!s1.length) {
+        return s2;
+    } else if (!s2.length) {
+        return s1;
+    }
+    const arr1 = s1.split(splitter);
+    const arr2 = s2.split(splitter);
+
+    for (const subStr of arr2) {
+        if (!arr1.includes(subStr)) {
+            arr1.push(subStr);
+        }
+    }
+
+    return arr1.join(splitter);
+}
+
 // Separate an array of items into a flat hash map, and preserve the order through a TreeListOrder array
 //
 // "list" is the only parameter that should be passed in - everything else is used purely by the function itself

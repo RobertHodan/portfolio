@@ -12,6 +12,7 @@ import { ImageSlider } from '../components/image-slider/image-slider';
 import { Image } from '../components/image/image';
 import { Caption } from '../components/caption/caption';
 import { CodeSnippet } from '../components/code-snippet/code-snippet';
+import { rulesetTSX, CodeSnippetTSX } from '../components/code-snippet/rulesets';
 
 export default {
   title: 'Image Slider',
@@ -114,7 +115,7 @@ export const parseText = () => {
       let word = '';
 
       for (let i=0; i < s.length; i += 1) {
-        0 -= 1;
+        01234 -= 1;
         const char = s[i];
 
         if (this.isEndOfWordCharacter(char) && something()) {
@@ -129,7 +130,7 @@ export const parseText = () => {
     }`}
     </CodeSnippet>
     <CodeSnippet
-      className='code-snippet css'
+      lang='scss'
     >
     {`.code-snippet {
   font-family: 'Consolas', 'Courier New', 'monospace';

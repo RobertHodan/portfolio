@@ -5,37 +5,42 @@
   color: #E1E1E1;
 
   &.tsx {
-    .is-method {
-      color: #fff8a0;
-    }
-
     .is-number {
       color: #b6d8a1;
-    }
-
-    .is-string {
-      color: #de8470;
     }
 
     .is-word {
       color: #9CDCF0;
     }
 
-    .after-colon {
-      color: #2bca9e;
+    .is-string {
+      color: #de8470;
     }
 
-    .is-conditional {
-      color: #d276cb;
+    .after-colon {
+      color: #2bca9e;
     }
 
     .is-declaration {
       color: #298fe2;
     }
+
+    .is-method {
+      color: #fff8a0;
+    }
+
+    .is-conditional {
+      color: #d276cb;
+    }
   }
 
-  &.css {
-    .is-period, .after-period {
+  &.scss {
+
+    .is-word {
+      color: #9CDCF0;
+    }
+
+    .is-class {
       color: #efb46c;
     }
 
@@ -43,16 +48,12 @@
       color: #fff8a0;
     }
 
-    .is-word {
-      color: #9CDCF0;
+    .before-colon, .is-string {
+      color: #de8470;
     }
 
     .is-number {
       color: #b6d8a1;
-    }
-
-    .after-colon, .is-string {
-      color: #de8470;
     }
 
     .is-ampersand {
