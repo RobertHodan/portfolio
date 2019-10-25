@@ -1,6 +1,6 @@
 import { Rule } from "./code-snippet";
 
-const chars = [' ', '-', '=', '.', '<', '>', '+', '{', '}', ':', '[', ']', '(', ')', '\n', ';', '!', '&'];
+const chars = [' ', '-', '=', '.', '<', '>', '+', '{', '}', ':', '[', ']', '(', ')', '\n', ';', '!', '&', ','];
 export const CodeSnippetTSX: Rule[] = [
   {
     symbols: chars,
@@ -63,6 +63,9 @@ export const CodeSnippetSCSS: Rule[] = [
     symbol: '.',
     className: 'is-class',
     affectNextSibling: true,
+    matchSiblings: true,
+    siblingIsConnected: true,
+    siblingBlacklist: ['&'],
   }, {
     symbol: '-',
     className: 'hyphen',
@@ -76,9 +79,9 @@ export const CodeSnippetSCSS: Rule[] = [
     classNameWhitelist: 'is-char',
     affectPreviousSibling: true,
   }, {
-    symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ','],
+    symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
     className: 'is-number',
-    siblingWhitelist: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'em', 'px', '%', ','],
+    siblingWhitelist: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'em', 'px', '%', ',', '.'],
     searchUntilChar: chars,
   }, {
     words: ['em', 'px', '%'],
@@ -99,5 +102,5 @@ export const CodeSnippetSCSS: Rule[] = [
     siblingIsConnected: true,
     className: 'is-method',
     classNameWhitelist: 'is-char',
-  }
+  },
 ]
