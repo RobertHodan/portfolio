@@ -28,11 +28,12 @@ export const CodeSnippetTSX: Rule[] = [
     symbol: '.',
     siblingIsConnected: true,
     matchSiblings: true,
+    classNameWhitelist: 'is-char',
   }, {
     symbol: '(',
     affectPreviousSibling: true,
-    // siblingIsNotCharacter: true,
-    // siblingIsConnected: true,
+    siblingIsNotCharacter: true,
+    siblingIsConnected: true,
     className: 'is-method',
     classNameWhitelist: 'is-char',
   }, {
@@ -55,4 +56,48 @@ export const CodeSnippetTSX: Rule[] = [
 ]
 
 export const CodeSnippetSCSS: Rule[] = [
+  {
+    symbols: chars,
+    className: 'is-char',
+  }, {
+    symbol: '.',
+    className: 'is-class',
+    affectNextSibling: true,
+  }, {
+    symbol: '-',
+    className: 'hyphen',
+    searchPreviousOnly: true,
+    affectPreviousSibling: true,
+    siblingIsConnected: true,
+    matchSiblings: true,
+  }, {
+    symbol: ':',
+    className: 'before-colon',
+    classNameWhitelist: 'is-char',
+    affectPreviousSibling: true,
+  }, {
+    symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ','],
+    className: 'is-number',
+    siblingWhitelist: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'em', 'px', '%', ','],
+    searchUntilChar: chars,
+  }, {
+    words: ['em', 'px', '%'],
+    className: 'is-number',
+  }, {
+    symbol: '{',
+    indentNextLine: 2,
+  }, {
+    symbol: '}',
+    indentCurrentLine: -2,
+  }, {
+    symbol: '&',
+    className: 'is-ampersand',
+  }, {
+    symbol: '(',
+    affectPreviousSibling: true,
+    siblingIsNotCharacter: true,
+    siblingIsConnected: true,
+    className: 'is-method',
+    classNameWhitelist: 'is-char',
+  }
 ]

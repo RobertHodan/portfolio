@@ -229,7 +229,6 @@ export class CodeSnippet extends React.Component<CodeSnippetProps> {
   updateSection(section: Section, className?: string, sectionsUpdated: Section[] = []) {
     // If the section has already been updated within the callstack, then don't update it again
     if (sectionsUpdated.includes(section)) {
-      console.error('Section has already been updated in the callstack');
       return;
     }
     sectionsUpdated.push(section);
@@ -269,6 +268,7 @@ export class CodeSnippet extends React.Component<CodeSnippetProps> {
         for (const v of valid) {
           this.updateSection(v, mergedClassNames, sectionsUpdated);
         }
+        section.className = concatStringsUnique(mergedClassNames, section.className);
       }
     }
 

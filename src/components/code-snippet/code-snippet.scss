@@ -39,8 +39,13 @@
   }
 
   &.scss {
+    color: #de8470;
 
-    .is-word {
+    .is-char {
+      color: #E1E1E1;
+    }
+
+    .hyphen, .before-colon {
       color: #9CDCF0;
     }
 
@@ -50,10 +55,6 @@
 
     .is-method {
       color: #fff8a0;
-    }
-
-    .before-colon, .is-string {
-      color: #de8470;
     }
 
     .is-number {
