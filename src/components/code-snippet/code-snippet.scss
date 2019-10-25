@@ -2,11 +2,15 @@
   font-family: 'Consolas', 'Courier New', 'monospace';
   font-weight: 300;
   background: rgb(29, 29, 29);
-  color: #E1E1E1;
+  color: #9CDCF0;
 
   &.tsx {
     .is-number {
       color: #b6d8a1;
+    }
+
+    .is-char {
+      color: #E1E1E1;
     }
 
     .is-word {
@@ -17,7 +21,7 @@
       color: #de8470;
     }
 
-    .after-colon {
+    .is-type {
       color: #2bca9e;
     }
 

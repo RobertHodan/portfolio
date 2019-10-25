@@ -22,7 +22,37 @@ export function createMapFromLabels(labels: string[]) {
     return createMapFromList(list);
 }
 
-export function concatStringsUnique(s1: string, s2: string, splitter: string = ' ') {
+export function removeClassNameByWhitelist(className: string, whitelist: string, splitter: string = ' '): string {
+    if (!className.length) {
+        return '';
+    }
+    const whitelistItems = whitelist.split(splitter);
+
+    let classNames = className.split(splitter);
+    classNames = classNames.filter((s) => whitelistItems.includes(s));
+
+    classNames.sort();
+
+    return classNames.join(splitter);
+}
+
+export function removeClassNameFromString(str: string, className: string, splitter: string = ' '): string {
+    if (!str.length) {
+        return '';
+    }
+    if (!className) {
+        return str;
+    }
+
+    let strArr = str.split(splitter);
+    strArr = strArr.filter((s) => s !== className);
+
+    strArr.sort();
+
+    return strArr.join(splitter);
+}
+
+export function concatStringsUnique(s1: string, s2: string, splitter: string = ' '): string {
     if (!s1.length) {
         return s2;
     } else if (!s2.length) {
@@ -36,6 +66,8 @@ export function concatStringsUnique(s1: string, s2: string, splitter: string = '
             arr1.push(subStr);
         }
     }
+
+    arr1.sort();
 
     return arr1.join(splitter);
 }

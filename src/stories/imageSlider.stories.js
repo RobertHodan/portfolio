@@ -115,7 +115,6 @@ export const parseText = () => {
       let word = '';
 
       for (let i=0; i < s.length; i += 1) {
-        01234 -= 1;
         const char = s[i];
 
         if (this.isEndOfWordCharacter(char) && something()) {

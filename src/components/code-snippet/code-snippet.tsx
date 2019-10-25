@@ -1,94 +1,80 @@
 import React from 'react';
 import './code-snippet.scss';
-import { concatStringsUnique, getNextUniqueId } from '../../utils/utils';
+import { concatStringsUnique, getNextUniqueId, removeClassNameFromString, removeClassNameByWhitelist } from '../../utils/utils';
 import { CodeSnippetTSX, CodeSnippetSCSS } from './rulesets';
 
-export type SectionRuleset = WordRuleset | SymbolRuleset;
-
-type WordRuleset = {
-  word: string,
+// Passed in by param
+export type Rule = {
+  // Aliases for "value"
+  word?: string,
   words?: string[],
-  className: string,
-  // If true, applies to any word that contains the string
-  isPartial?: boolean,
-};
-
-type SymbolRuleset = {
   symbol?: string,
   symbols?: string[],
   className?: string,
-  excludeSelf?: boolean,
-  // Only include words connected by a non-whitespace symbol
-  connectWords?: boolean,
-  // Include next word, regardless of whitespace
-  includeNextWord?: boolean,
-  includePreviousWord?: boolean,
-  usePreviousWord?: boolean,
-}
+} & SectionOptions;
 
 type SectionMap = {
-  [id: string]: WordData | SymbolData;
+  [id: string]: Section,
 }
 
-type WordData = {
+type Section = {
   id: string,
-} & WordCoreData;
+} & SectionData;
 
-type SymbolData = {
-  id: string,
-} & SymbolCoreData;
-
-type SymbolCoreData = {
-  symbol: string,
+type SectionData = {
+  value: string,
   className: string,
-  excludeSelf?: boolean,
-  // Only include words connected by a non-whitespace symbol
-  connectWords?: boolean,
-  // Include next word, regardless of whitespace
-  includeNextWord?: boolean,
-  includePreviousWord?: boolean,
-  // Use the className of the previous word
-  usePreviousWord?: boolean,
-  useNextWord?: boolean,
-}
+} & SectionOptions;
 
-type WordCoreData = {
-  className: string,
-  word: string,
-  isPartial?: boolean,
-}
-
-type WordRulesetMap = {
-  [word: string]: WordCoreData,
-}
-
-type SymbolRulesetMap = {
-  [symbol: string]: SymbolCoreData,
+type SectionOptions = {
+  // Apply the class name to the next section
+  affectNextSibling?: boolean,
+  // Apply the class name to the previous section
+  affectPreviousSibling?: boolean,
+  // Apply class name if siblings have values greater than one character
+  siblingIsNotCharacter?: boolean,
+  // Apply class name if siblings are immediately beside
+  siblingIsConnected?: boolean,
+  // Apply class name if sibling value matches any value in the list
+  siblingWhitelist?: string[],
+  // Apply class name if sibling value is not on the list
+  siblingBlacklist?: string[],
+  // Extends search beyond direct siblings
+  // Search siblings until a sibling is hit with any of the given values
+  searchUntilChar?: string[],
+  // Search siblings until a valid one is found
+  searchUntilValid?: boolean,
+  // Only search forwards, for siblings in front
+  searchNextOnly?: boolean,
+  // Only search backwards, for siblings behind
+  searchPreviousOnly?: boolean,
+  // Only apply class name if it's contained in the whitelist
+  // Siblings are not affected by this
+  classNameWhitelist?: string,
+  // Merges all sibling classnames, and applies it to them all
+  // Does not affect the current section
+  matchSiblings?: boolean,
+  // Indent the next line when the character is hit
+  indentNextLine?: number,
+  indentCurrentLine?: number,
+  // Used for end of line characters, for internal use only
+  indentation?: number,
 }
 
 export type CodeSnippetProps = {
   children: string,
-  indentation: number,
-  indentationIncreaseChar: string,
-  indentationDecreaseChar: string,
   className: string,
   lang?: string,
 };
 
 export class CodeSnippet extends React.Component<CodeSnippetProps> {
-  static defaultProps = {
-    indentation: 2,
-    indentationIncreaseChar: '{',
-    indentationDecreaseChar: '}',
-  }
-  includePreviousWordOverride?: boolean;
   sectionMap: SectionMap = {};
-  sectionOrder: string[] = [];
-  prevSection?: SymbolData | WordData;
+  sectionIds: string[] = [];
+  ruleMap: {[id: string]: SectionData} = {};
 
   render () {
     const { lang } = this.props;
-    let ruleset: SectionRuleset[] = [];
+    let ruleset: Rule[] = [];
     let className = this.props.className || 'code-snippet';
     if (!lang || lang === 'tsx') {
       ruleset = CodeSnippetTSX;
@@ -97,311 +83,392 @@ export class CodeSnippet extends React.Component<CodeSnippetProps> {
       ruleset = CodeSnippetSCSS;
       className += ' scss';
     }
-    this.updateSections(this.props.children, ruleset);
+
+    this.createRules(ruleset);
+    this.createSections(this.props.children);
+    this.applyRulesToSections();
 
     return (
       <pre className={className}>
-        {this.generateElements()}
+        {this.createElementsFromSections()}
       </pre>
     );
   }
 
-  generateElements() {
-    const elements: React.ReactNode[] = [];
-    const ids = this.sectionOrder;
-    let values = '';
-    for (let i = 0; i < ids.length; i += 1) {
-      const section = this.sectionMap[ids[i]];
-      const nextSection = this.sectionMap[ids[i+1]];
-      let value = this.getValue(section);
+  createRules(rules: Rule[]) {
+    for (const rule of rules) {
+      const values = this.getValues(rule);
+      // Remove aliases
+      const { symbol, symbols, word, words, className, ...options } = rule;
 
-      if (nextSection && section.className === nextSection.className) {
-        values += value;
-        continue;
+      for (const value of values) {
+        const existing = this.ruleMap[value];
+        const existingClassName = existing ? existing.className : '';
+        const newClassName = concatStringsUnique(existingClassName, className || '');
+        this.ruleMap[value] = this.overrideObjectProperties(existing, {
+          value,
+          className: newClassName,
+          ...options,
+        });
       }
+    }
+  }
 
-      if (values.length) {
-        value = values + value;
-        values = '';
-      }
+  overrideObjectProperties(obj1: any, obj2: any) {
+    if (!obj1) {
+      return obj2;
+    }
+    const newObj = Object.assign({}, obj1);
 
-      elements.push((
-        <span className={section.className} key={section.id}>{value}</span>
-      ))
+    const keys = Object.keys(obj2);
+    for (const key of keys) {
+      newObj[key] = obj2[key];
     }
 
-    return elements;
+    return newObj;
   }
 
-  getValue(data: WordData | SymbolData) {
-    return this.isWordRuleset(data)
-      ? (data as WordData).word
-      : (data as SymbolData).symbol;
+  getValues(rule: Rule) {
+    let values: string[] = [];
+    if (rule.symbol) {
+      values.push(rule.symbol);
+    }
+    if (rule.word) {
+      values.push(rule.word);
+    }
+    if (rule.symbols) {
+      values = values.concat(rule.symbols);
+    }
+    if (rule.words) {
+      values = values.concat(rule.words);
+    }
+
+    return values;
   }
 
-  updateSections(code: string, rulesets: SectionRuleset[]) {
-    const [symbolRulesMap, symbolList] = this.getSymbolRules(rulesets);
-    const [wordRulesMap, wordList] = this.getWordRules(rulesets);
-
-    this.sectionMap = {};
-    this.sectionOrder = [];
-    let word = '';
-    let wordIsNumber = true;
-    let prevWordSection;
-    let nextWordClassName = '';
-    let stripSpaces = false;
-    let previousIndentation;
+  createSections(code: string) {
+    let sectionValue = '';
+    let shouldStripIndentation = true;
     let indentation = 0;
-    for (let i = 0; i < code.length; i += 1) {
-      const char = code[i];
-      const nextChar = code[i+1];
-      const prevChar = code[i-1];
 
-      if (char === this.props.indentationIncreaseChar) {
-        indentation += this.props.indentation;
-      } else if (char === this.props.indentationDecreaseChar && previousIndentation) {
-        indentation -= this.props.indentation;
-        (previousIndentation as WordData).word = ' '.repeat(indentation);
-      }
+    let currentLineIndent: Section | undefined;
+    for (const char of code) {
+      const charRules = this.ruleMap[char];
 
-      if (char !== ' ') {
-        stripSpaces = false;
-      }
-
-      // Check for letters
-      if (this.isLetterOrNumber(char) ||
-        // Check if the period is used within a float
-        (char === '.' && this.isNumber(prevChar) && this.isNumber(nextChar))
-      ) {
-        if (this.isLetter(char)) {
-          wordIsNumber = false;
-        }
-        word += char;
+      if (shouldStripIndentation && char === ' ') {
         continue;
+      } else {
+        shouldStripIndentation = false;
       }
 
-      // Check if a word should be handled
-      if (word.length) {
-
-        const isNumber = wordIsNumber;
-        const wordRules = {
-          word: word,
-          className: isNumber ? 'is-number' : 'is-word',
-        }
-        if (nextWordClassName) {
-          wordRules.className = concatStringsUnique(wordRules.className, nextWordClassName);
-          nextWordClassName = '';
-        }
-        if (wordList.includes(word)) {
-          wordRules.className = concatStringsUnique(wordRules.className, wordRulesMap[word].className);
-        }
-        const newId = getNextUniqueId();
-        this.addSection(newId, wordRules);
-
-        prevWordSection = this.sectionMap[newId];
-        word = '';
-        wordIsNumber = true;
-      }
-
-      // Handle symbols
-      if (symbolList.includes(char)) {
-        const {className, ...rules} = symbolRulesMap[char];
-        const newId = getNextUniqueId();
-        let newClassName = className;
-        if (rules.usePreviousWord) {
-          newClassName = prevWordSection
-            ? prevWordSection.className
-            : '';
-        }
-        if (rules.useNextWord) {
-          this.includePreviousWordOverride = true;
-        }
-
-        if (rules.includeNextWord) {
-          if (!rules.connectWords || this.isLetter(nextChar)) {
-            nextWordClassName = concatStringsUnique(nextWordClassName, newClassName);
-          }
-        }
-
-        if (rules.includePreviousWord) {
-          this.modifyPreviousSectionClassName(newClassName);
-          if (!rules.connectWords || this.isLetter(prevChar)
-          ) {
-            // prevWordSection.className = concatStringsUnique(prevWordSection.className, newClassName);
-          }
-        }
-
-        if (!rules.excludeSelf) {
-          this.addSection(newId, {
-            className: newClassName,
-            ...rules,
+      // Add words
+      if (charRules) {
+        const rules = this.ruleMap[sectionValue];
+        // Create a section for the string of characters
+        if (sectionValue.length) {
+          this.createNewSection(rules || {
+            value: sectionValue,
+            className: '',
           });
-          continue;
-        }
-      }
-
-      // Handle all other symbols
-      if (!this.isLetter(char)) {
-        // Strip spaces out at the start of each line
-        // These will be programmatically added back in
-        if (char === '\n') {
-          nextWordClassName = '';
-          stripSpaces = true;
-        }
-        if (stripSpaces && char === ' ') {
-          continue;
         }
 
-        const newId = getNextUniqueId();
-        this.addSection(newId, {
-          symbol: char,
+        // Create a section for the character
+        const id = this.createNewSection(charRules || {
+          value: char,
           className: '',
         });
 
-        // Handle indentation
         if (char === '\n') {
-          const indentId = getNextUniqueId();
-          this.addSection(indentId, {
-            word: ' '.repeat(indentation),
-            className: '',
-          });
-          previousIndentation = this.sectionMap[indentId];
+          currentLineIndent = this.sectionMap[id];
+          shouldStripIndentation = true;
+          currentLineIndent.indentation = indentation;
         }
+        if (char === '\n') {
+          currentLineIndent = this.sectionMap[id];
+        }
+
+        if (charRules.indentCurrentLine && currentLineIndent) {
+          indentation += charRules.indentCurrentLine;
+          currentLineIndent.indentation = indentation;
+        }
+        if (charRules.indentNextLine) {
+          indentation += charRules.indentNextLine;
+        }
+
+        sectionValue = '';
+      } else {
+        sectionValue += char;
       }
     }
   }
 
-  modifyPreviousSectionClassName(className: string) {
-    if (this.prevSection) {
-      this.modifySectionClassName(this.prevSection.id, className);
-    }
-  }
-
-  // Can only work backwards
-  modifySectionClassName(id: string, className: string) {
-    let section = this.sectionMap[id];
-    if (!section) {
-      return;
-    }
-    if (this.isWordRuleset(section)) {
-      section.className = concatStringsUnique(section.className, className);
-      return;
-    }
-    section = section as SymbolData;
-
-    if (!section.excludeSelf) {
-      section.className = concatStringsUnique(section.className, className);
-    }
-
-    const prevSection = this.getPreviousSection(section.id);
-    if (section.includePreviousWord && prevSection) {
-      this.modifySectionClassName(prevSection.id, className);
-    }
-  }
-
-  getPreviousSection(id: string): SymbolData | WordData | undefined {
-    const index = this.sectionOrder.indexOf(id);
-    return this.sectionMap[this.sectionOrder[index-1]];
-  }
-
-  addSection(id: string, data: WordCoreData | SymbolCoreData) {
-    this.sectionMap[id] = {
-      id: id,
-      ...data,
+  createNewSection(section: SectionData): string {
+    const newId = getNextUniqueId();
+    this.sectionMap[newId] = {
+      id: newId,
+      ...section,
     };
-    let section = this.sectionMap[id];
-    this.prevSection = this.sectionMap[id];
+    this.sectionIds.push(newId);
 
-    if (this.includePreviousWordOverride !== undefined) {
-      section = section as SymbolData;
-      section.includePreviousWord = this.includePreviousWordOverride;
-      this.includePreviousWordOverride = undefined;
+    return newId;
+  }
+
+  applyRulesToSections() {
+    for (const id of this.sectionIds) {
+      const section = this.sectionMap[id];
+      this.updateSection(section);
+    }
+  }
+
+  shouldCheckByValidity(section: Section): boolean {
+    return (section.searchUntilValid || section.searchUntilChar ||
+      section.affectNextSibling || section.affectPreviousSibling ||
+      section.matchSiblings) !== undefined;
+  }
+
+  updateSection(section: Section, className?: string, sectionsUpdated: Section[] = []) {
+    // If the section has already been updated within the callstack, then don't update it again
+    if (sectionsUpdated.includes(section)) {
+      console.error('Section has already been updated in the callstack');
+      return;
+    }
+    sectionsUpdated.push(section);
+    if (section.className === className) {
+      return;
     }
 
-    this.sectionOrder.push(id);
-  }
-
-  isLetterOrNumber(char: string): boolean {
-    return this.isLetter(char) || this.isNumber(char);
-  }
-
-  isNumber(char: string): boolean {
-    return char >= '0' && char <= '9';
-  }
-
-  isLetter(char: string): boolean {
-    const lower = char.toLowerCase();
-    return lower >= 'a' && lower <= 'z';
-  }
-
-  getWordRules(rulesets: SectionRuleset[]): [WordRulesetMap, string[]] {
-    const rulesetWords: string[] = [];
-    const rulesetMap: WordRulesetMap = {};
-
-    rulesets.forEach((ruleset) => {
-      if (!this.isWordRuleset(ruleset)) {
-        return;
+    if (this.shouldCheckByValidity(section)) {
+      const [valid, invalid] = this.getSiblingsByValidity(section);
+      if (section.searchUntilChar && invalid.length) {
+        section.className = removeClassNameFromString(section.className, this.getClassNameByValue(section.value));
       }
 
-      const wordRuleset = ruleset as WordRuleset;
-      const words = wordRuleset.words || [wordRuleset.word];
-      for (const word of words) {
-        const wordData = rulesetMap[word];
-        let classNames = wordData
-          ? concatStringsUnique(rulesetMap[word].className, wordRuleset.className)
-          : wordRuleset.className;
-
-        rulesetMap[word] = {
-          className: classNames,
-          word: word,
-          // isPartial: wordData.isPartial,
-        };
-        if (!rulesetWords.includes(word)) {
-          rulesetWords.push(word);
+      if (section.affectNextSibling || section.affectPreviousSibling) {
+        let affectedNext = !section.affectNextSibling;
+        let affectedPrev = !section.affectPreviousSibling;
+        for (const v of valid) {
+          if (!affectedNext && this.isSiblingAfter(section, v)) {
+            affectedNext = true;
+            this.updateSection(v, section.className, sectionsUpdated);
+          }
+          if (!affectedPrev && this.isSiblingBefore(section, v)) {
+            affectedPrev = true;
+            this.updateSection(v, section.className, sectionsUpdated);
+          }
+          if (affectedPrev && affectedNext) {
+            break;
+          }
         }
       }
-    });
 
-    return [rulesetMap, rulesetWords];
-  }
-
-  isWordRuleset(ruleset: SectionRuleset) {
-    return ruleset.hasOwnProperty('words') || ruleset.hasOwnProperty('word');
-  }
-
-  isSymbolRuleset(ruleset: SectionRuleset) {
-    return ruleset.hasOwnProperty('symbol') || ruleset.hasOwnProperty('symbols');
-  }
-
-  getSymbolRules(rulesets: SectionRuleset[]): [SymbolRulesetMap, string[]] {
-    const rulesetSymbols: string[] = [];
-    const rulesetMap: SymbolRulesetMap = {};
-
-    rulesets.forEach((ruleset) => {
-      // Don't add any non-symbol rulesets
-      if (!this.isSymbolRuleset(ruleset)) {
-        return;
-      }
-
-      const {symbols, symbol, ...rules} = ruleset as SymbolRuleset;
-      const symbolsArray = symbols || (symbol && [symbol]) || [];
-      for (const symbolValue of symbolsArray) {
-        const symbolData = rulesetMap[symbolValue];
-        let classNames = symbolData
-          ? concatStringsUnique(rulesetMap[symbolValue].className, rules.className || '')
-          : rules.className || '';
-
-        rulesetMap[symbolValue] = {
-          className: classNames,
-          symbol: symbolValue,
-          ...rules,
+      if (section.matchSiblings) {
+        let mergedClassNames = '';
+        for (const v of valid) {
+          mergedClassNames = concatStringsUnique(mergedClassNames, v.className);
         }
-        if (!rulesetSymbols.includes(symbolValue)) {
-          rulesetSymbols.push(symbolValue);
+        for (const v of valid) {
+          this.updateSection(v, mergedClassNames, sectionsUpdated);
         }
       }
-    });
+    }
 
-    return [rulesetMap, rulesetSymbols];
+    if (className) {
+      section.className = concatStringsUnique(section.className, className);
+    }
+  }
+
+  getClassNameByValue(value: string): string {
+    const rule = this.ruleMap[value];
+
+    return rule ? rule.className : '';
+  }
+
+  isValidSibling(section: Section, sibling: Section) {
+    if (section.siblingIsNotCharacter && sibling.value.length <= 1) {
+      return false;
+    }
+
+    if (!this.isSiblingConnected(section, sibling)) {
+      return false;
+    }
+
+    if (!this.siblingWithinWhitelist(section, sibling)) {
+      return false;
+    }
+
+    if (this.siblingWithinBlacklist(section, sibling)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  siblingWithinBlacklist(section: Section, sibling: Section) {
+    if (!section.siblingBlacklist) {
+      return false;
+    }
+
+    return section.siblingBlacklist.includes(sibling.value);
+  }
+
+  siblingWithinWhitelist(section: Section, sibling: Section) {
+    if (!section.siblingWhitelist) {
+      return true;
+    }
+
+    return section.siblingWhitelist.includes(sibling.value);
+  }
+
+  isSiblingConnected(section: Section, sibling: Section): boolean {
+    if (!section.siblingIsConnected) {
+      return true;
+    }
+
+    const sectionIndex = this.sectionIds.indexOf(section.id);
+    const siblingIndex = this.sectionIds.indexOf(sibling.id);
+
+    return Math.abs(sectionIndex - siblingIndex) <= 1;
+  }
+
+  getSectionByIndex(index: number): Section | undefined {
+    return this.sectionMap[ this.sectionIds[index] ];
+  }
+
+  getSectionById(id: string): Section {
+    return this.sectionMap[id];
+  }
+
+  isSiblingAfter(section: Section, sibling: Section): boolean {
+    const index = this.getIndex(section);
+    const siblingIndex = this.getIndex(sibling);
+
+    return (index - siblingIndex) < 0;
+  }
+
+  isSiblingBefore(section: Section, sibling: Section): boolean {
+    const index = this.getIndex(section);
+    const siblingIndex = this.getIndex(sibling);
+
+    return (index - siblingIndex) > 0;
+  }
+
+  shouldCheckSibling(section: Section, sibling?: Section): boolean {
+    if (!sibling) {
+      return false;
+    }
+
+    if (section.siblingIsConnected) {
+      return this.isSiblingConnected(section, sibling);
+    }
+
+    if (section.searchUntilChar && section.searchUntilChar.includes(sibling.value)) {
+      return false;
+    }
+
+    if (section.searchNextOnly && this.isSiblingBefore(section, sibling)) {
+      return false;
+    }
+
+    if (section.searchPreviousOnly && this.isSiblingAfter(section, sibling)) {
+      return false;
+    }
+
+    const shouldBeConnected = !section.searchUntilChar && !section.searchUntilValid;
+    if (shouldBeConnected && (section.affectNextSibling || section.affectPreviousSibling)) {
+      return this.isSiblingConnected(section, sibling);
+    }
+
+    return true;
+  }
+
+  getSiblingsByValidity(section: Section): [Section[], Section[]] {
+    const ids = this.sectionIds;
+    const sectionIndex = this.sectionIds.indexOf(section.id);
+    let stopCheckingNext = false;
+    let stopCheckingPrev = false;
+    const validSiblings: Section[] = [];
+    const invalidSiblings: Section[] = [];
+    for (let i = 1; i < ids.length; i += 1) {
+      const nextSibling = this.getSectionByIndex(sectionIndex+i);
+      const prevSibling = this.getSectionByIndex(sectionIndex-i);
+      if (!this.shouldCheckSibling(section, prevSibling)) {
+        stopCheckingPrev = true;
+      }
+      if (!this.shouldCheckSibling(section, nextSibling)) {
+        stopCheckingNext = true;
+      }
+      if (stopCheckingNext && stopCheckingPrev) {
+        break;
+      }
+
+      if (!stopCheckingNext) {
+        const isNextValid = this.isValidSibling(section, nextSibling!);
+        if (!isNextValid) {
+          invalidSiblings.push(nextSibling!);
+        } else {
+          validSiblings.push(nextSibling!);
+          if (section.searchUntilValid) {
+            stopCheckingNext = true;
+          }
+        }
+      }
+
+      if (!stopCheckingPrev) {
+        const isPrevValid = this.isValidSibling(section, prevSibling!);
+        if (!isPrevValid) {
+          invalidSiblings.push(prevSibling!);
+        } else {
+          validSiblings.push(prevSibling!);
+          if (section.searchUntilValid) {
+            stopCheckingPrev = true;
+          }
+        }
+      }
+    }
+
+    return [validSiblings, invalidSiblings];
+  }
+
+  getIndex(section: Section): number {
+    return this.sectionIds.indexOf(section.id);
+  }
+
+  getNextSection(section: Section): Section | undefined {
+    const index = this.getIndex(section);
+    return this.getSectionByIndex(index+1);
+  }
+
+  createElementsFromSections() {
+    const children = [];
+    let combinedValues = '';
+    let prevSection: Section | undefined;
+    let prevClassName: string | undefined;
+    for (const id of this.sectionIds) {
+      const section = this.sectionMap[id];
+      let className = section.className.length ? section.className : undefined;
+      if (className && section.classNameWhitelist) {
+        className = removeClassNameByWhitelist(className, section.classNameWhitelist);
+      }
+
+      const isLast = this.sectionIds.indexOf(section.id) === this.sectionIds.length-1;
+      if (prevSection && prevClassName !== className || isLast) {
+        children.push(<span key={prevSection!.id} className={prevClassName}>{combinedValues}</span>);
+        combinedValues = '';
+      }
+
+      if (isLast) {
+        children.push(<span key={section.id} className={className}>{section.value}</span>);
+      }
+
+
+      combinedValues += section.value;
+      prevClassName = className;
+      prevSection = section;
+      if (section.indentation && section.indentation >= 0) {
+        combinedValues += ' '.repeat(section.indentation);
+      }
+    }
+
+    return children;
   }
 }
