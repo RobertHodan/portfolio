@@ -1,18 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.scss';
 import { Header } from './pages/header/header';
 import { Footer } from './pages/footer/footer';
 import { MainMenu } from './pages/main-menu/main-menu';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 const App: React.FC = () => {
   return (
     <>
-      <Header></Header>
-      <div className="App wrapper">
-        <MainMenu></MainMenu>
-        <Footer></Footer>
-      </div>
+      <Router>
+        <Header></Header>
+        <div className="App wrapper">
+            <Switch>
+            <Route path="/portfolio-project">
+
+              </Route>
+              <Route path="/">
+                <MainMenu></MainMenu>
+              </Route>
+            </Switch>
+          <Footer></Footer>
+        </div>
+      </Router>
     </>
   );
 }

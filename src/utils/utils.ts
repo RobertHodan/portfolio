@@ -6,7 +6,7 @@ export function getNextUniqueId() {
     return `componentId-${id += 1}`;
 }
 
-export function createMapFromList(list: TreeListItem[] | ListMapItem[]): [(TreeListMap | ListMap), string[]] {
+export function createMapFromList<T>(list: (T & ListMapItem)[] | ListMapItem[]): [ListMap, string[]] {
     return flattenListRecursive(list);
 }
 
@@ -75,34 +75,40 @@ export function concatStringsUnique(s1: string, s2: string, splitter: string = '
 // Separate an array of items into a flat hash map, and preserve the order through a TreeListOrder array
 //
 // "list" is the only parameter that should be passed in - everything else is used purely by the function itself
-function flattenListRecursive(
-    list: TreeListItem[] | ListMapItem[],
-    flatList: TreeListMap = {},
+function flattenListRecursive<T>(
+    list: T[] & ListMapItem[] | T[] & TreeListItem[] | ListMapItem[] | TreeListItem[],
+    flatList: ListMap | TreeListMap = {},
     parentId?: string,
     recursiveCount: number = 0,
     rootParentId?: string,
-): [TreeListMap, string[]] {
+): [TreeListMap | ListMap, string[]] {
 const siblings = [];
 
-for (const item of list) {
-    const itemDetails: TreeListMapItem = {
-        id: item.id,
-        label: item.label,
-        parentId: parentId,
-        childIds: [],
-        rootParentId: rootParentId,
-        collapsed: true,
-    };
-
-    flatList[item.id] = itemDetails;
+for (let item of list) {
+    let itemDetails: TreeListMapItem | ListMapItem;
     siblings.push(item.id);
 
     if (item.hasOwnProperty('subItems')) {
+        const { subItems, ...partialItemDetails } = item as TreeListItem;
+        itemDetails = {
+            parentId: undefined,
+            childIds: [],
+            rootParentId: undefined,
+            ...partialItemDetails,
+        } as TreeListMapItem;
+        flatList[item.id] = itemDetails;
+
         rootParentId = (recursiveCount === 0) ? item.id : rootParentId;
         // Add child items to the flatList, and also add their ids to the current item
-        const [flat, childIds] = flattenListRecursive((item as TreeListItem).subItems, flatList, item.id, recursiveCount + 1, rootParentId);
-        itemDetails.childIds = childIds as string[];
+        const [flat, childIds] = flattenListRecursive((item as TreeListItem).subItems, flatList,
+            item.id, recursiveCount + 1, rootParentId
+        ) as [TreeListMap, string[]];
+        (itemDetails as TreeListMapItem).childIds = childIds as string[];
+    } else {
+        flatList[item.id] = item;
     }
+
+
 }
 
 // Return the childIds purely for recursion, otherwise return the completed flatList and order

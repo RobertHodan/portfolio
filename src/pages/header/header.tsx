@@ -1,30 +1,46 @@
 import React from 'react';
-import { createMapFromLabels } from '../../utils/utils';
+import { createMapFromLabels, createMapFromList, getNextUniqueId } from '../../utils/utils';
 import { List } from '../../components/list/list';
 import { ListItemProps } from '../../components/list-item/list-item';
 import './header.scss';
+import { Link } from 'react-router-dom';
+import { NavList, NavListProps, NavListMap } from '../../components/nav-list/nav-list';
 
 export function Header() {
-  const [map, order] = createMapFromLabels(['Works', 'About', 'Contact', 'Resume']);
-  const item = (props: ListItemProps) => {
-    return (
-      <a>
-        {props.label}
-      </a>
-    )
-  }
+  const data = [
+    {
+      id: getNextUniqueId(),
+      label: 'Works',
+      path: '/',
+    }, {
+      id: getNextUniqueId(),
+      label: 'About',
+      path: '/about',
+    }, {
+      id: getNextUniqueId(),
+      label: 'Contact',
+      path: '/contact',
+    },
+    {
+      id: getNextUniqueId(),
+      label: 'Resume',
+      path: '/resume',
+    }
+  ];
+
+  const [map, order] = createMapFromList(data) as [NavListMap, string[]];
 
   return (
     <header className={'header'}>
       <div className={'spacing-div'}></div>
-      <h1>Robert Hodan</h1>
-      <List
-        list={ map }
+      <Link to={'/'}>
+        <h1>Robert Hodan</h1>
+      </Link>
+      <NavList
+        listMap={ map }
         listOrder={ order }
-        itemChildren={ item }
         className={ 'header-nav' }
-        selectedId={ order[0] }
-      ></List>
+      ></NavList>
     </header>
   );
 }

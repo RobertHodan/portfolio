@@ -10,20 +10,24 @@ import twitterIcon from '../../icons/twitter.svg';
 export function Footer() {
   const mapToData: any = {
     'roberthodan@outlook.com': {
-      href: '',
+      href: 'mailto:roberthodan@outlook.com',
       icon: emailIcon,
     },
     '@RobertHodan': {
-      href: '',
+      href: 'https://twitter.com/RobertHodan',
       icon: twitterIcon,
     },
     'RobertHodan': {
-      href: '',
+      href: 'https://github.com/RobertHodan',
       icon: githubIcon,
     },
   }
   const [map, order] = createMapFromLabels(Object.keys(mapToData));
   const item = (props: ListItemProps) => {
+    if (!props.label) {
+      return;
+    }
+
     return (
       <a href={mapToData[props.label].href}>
         <div className='icon'>
@@ -38,9 +42,9 @@ export function Footer() {
     <footer className={'footer'}>
       <p>Robert Hodan &copy; Copyright 2019</p>
       <List
-        list={ map }
+        listMap={ map }
         listOrder={ order }
-        itemChildren={ item }
+        functionItemContent={ item }
         className={ 'contact-links' }
       ></List>
     </footer>

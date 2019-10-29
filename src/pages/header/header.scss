@@ -9,13 +9,15 @@
   justify-content: space-between;
   align-items: center;
   color: $text-color-primary;
+  border-bottom: 1px solid $border-color-secondary;
 
   h1 {
     font-size: 1.286em;
+    margin: 0;
   }
 
   .spacing-div, .header-nav {
-    width: 30em;
+    width: 25em;
   }
 
   .header-nav {
@@ -23,19 +25,29 @@
     justify-content: space-around;
     padding: 0;
     margin: 0;
+    height: 3.5em;
   }
 
   .list-item {
     color: $text-color-primary;
-    height: 3em;
+    height: 100%;
     display: flex;
     align-items: center;
     place-content: center;
-    height: 4.5rem;
     flex-grow: 1;
 
     &.selected {
       border-bottom: 0.2em solid $highlight-color-primary;
+    }
+
+    &:hover {
+      background: $hover-color-primary;
+      color: $text-color-highlight;
+      border-bottom: 1px solid $hover-color-primary;
+
+      &.selected {
+        border-bottom: 0.2em solid $highlight-color-secondary;
+      }
     }
   }
 }

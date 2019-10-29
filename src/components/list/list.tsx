@@ -1,5 +1,4 @@
 import React from 'react';
-import { TreeList } from '../tree-list/tree-list';
 import { ListItemProps, ListItem } from '../list-item/list-item';
 
 export type ListMapItem = {
@@ -14,6 +13,9 @@ export type ListMap = {
   [id: string]: ListMapItem,
 }
 
+type ListItemCallback = (props: ListMapItem) => React.ReactNode;
+type GenericCallback = <T>(props: ListMapItem & T) => React.ReactNode;
+
 export type ListProps = {
   listMap: ListMap,
   listOrder: string[],
@@ -21,21 +23,17 @@ export type ListProps = {
   onItemClick?: (props: ListItemProps, event: React.MouseEvent) => void,
   onKeyDown?: (event: React.KeyboardEvent<HTMLUListElement>) => void,
   role?: string,
-  functionItem?: (props: ListItemProps) => React.ReactNode,
+  functionItem?: GenericCallback | ListItemCallback,
+  functionItemContent?: GenericCallback | ListItemCallback,
   selectedId?: string,
 };
 
 export class List extends React.Component<ListProps> {
-  allSelectedIds: string[];
-
-  constructor(props: ListProps) {
-    super(props);
-
-    this.allSelectedIds = [];
-  }
+  allSelectedIds: string[] = [];
 
   render() {
     const { listMap, className, onKeyDown, role } = this.props;
+    console.log('rendered');
     // Reset all selections
     for (const id of this.allSelectedIds) {
       listMap[id].selected = false;
@@ -58,7 +56,7 @@ export class List extends React.Component<ListProps> {
   }
 
   createItems(): React.ReactNode {
-    const { listMap, onItemClick, functionItem, listOrder } = this.props;
+    const { listMap, onItemClick, functionItem, functionItemContent, listOrder } = this.props;
     return listOrder.map(((id: string) => {
       const item = listMap[id];
 
@@ -69,6 +67,7 @@ export class List extends React.Component<ListProps> {
       return <ListItem
         key={ item.id }
         onClick={ onItemClick }
+        functionItem={ functionItemContent }
         {...item}
       >
       </ListItem>
