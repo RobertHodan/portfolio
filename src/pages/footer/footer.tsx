@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { createMapFromLabels } from '../../utils/utils';
 import { List } from '../../components/list/list';
 import { ListItemProps } from '../../components/list-item/list-item';
@@ -23,7 +23,7 @@ export function Footer() {
     },
   }
   const [map, order] = createMapFromLabels(Object.keys(mapToData));
-  const item = (props: ListItemProps) => {
+  const item = useCallback((props: ListItemProps) => {
     if (!props.label) {
       return;
     }
@@ -36,7 +36,7 @@ export function Footer() {
         {props.label}
       </a>
     )
-  }
+  }, []);
 
   return (
     <footer className={'footer'}>

@@ -50,4 +50,20 @@
       }
     }
   }
+
+  @media only screen and (max-width: 500px) {
+    height: 8vh;
+
+    .spacing-div, .header-nav {
+      width: 5em;
+    }
+
+    .spacing-div > nav {
+      display: none;
+    }
+
+    .hamburger-menu {
+      margin-left: 1em;
+    }
+  }
 }

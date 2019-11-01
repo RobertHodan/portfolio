@@ -8,21 +8,25 @@ export type TreeListItem = {
   subItems: TreeListItem[],
 }
 
-export interface TreeListControllerProps extends TreeListProps {
+type ListItemCallback = (props: TreeListMapItem) => React.ReactNode;
+type GenericCallback = <T>(props: TreeListMapItem & T) => React.ReactNode;
+
+export interface TreeListControllerProps extends Omit<TreeListProps, 'listOrder'> {
   listMap: TreeListMap,
   rootIds: string[],
+  functionItemContent?: GenericCallback | ListItemCallback,
   // If an item is selected, but it belongs to a collapsed parent, then show that parent as selected instead
-  selectNearestParent: boolean,
+  selectNearestParent?: boolean,
   // If the end of the list is reached, roll over to the other side
-  rollover: boolean,
+  rollover?: boolean,
   // Number in ms, determines if consecutive key inputs should be contactinated together into a string
   // before searching for which item to focus
   //
   // 0  = Will only search one letter at a time, no chaining.
-  inputChainThreshold: number,
+  inputChainThreshold?: number,
   // Treats a duplicate character as one single character. Eg. 'dd' will become 'd'
   // Used to make functionality a little more responsive
-  inputChainTreatDoubleCharAsSingle: boolean,
+  inputChainTreatDoubleCharAsSingle?: boolean,
 };
 
 export interface TreeListControllerState {
@@ -510,7 +514,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
       prevItem = map[siblingId];
 
       // If the sibling has children, then use its last child instead
-      if (prevItem.childIds.length && !prevItem.collapsed) {
+      if (prevItem && prevItem.childIds.length && !prevItem.collapsed) {
         const childId = prevItem.childIds[prevItem.childIds.length-1];
         prevItem = map[childId];
       }

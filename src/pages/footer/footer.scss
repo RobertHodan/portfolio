@@ -49,4 +49,18 @@
       }
     }
   }
+
+  @media only screen and (max-width: 500px) {
+    padding: 2em 0 0 1.5em;
+    flex-wrap: wrap;
+
+    p {
+      order: 1;
+      padding-top: 1em;
+    }
+
+    .list-item a {
+      border-left: 0.4em solid $highlight-color-primary;
+    }
+  }
 }

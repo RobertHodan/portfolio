@@ -14,7 +14,7 @@ export type CollapsibleItemProps = ListItemProps & {
 }
 
 export class CollapsibleItem extends React.Component<CollapsibleItemProps> {
-  static defaultProps: {
+  static defaultProps = {
     childIds: [],
   }
   preventClick: boolean = false;
@@ -34,7 +34,7 @@ export class CollapsibleItem extends React.Component<CollapsibleItemProps> {
   }
 
   render() {
-    const {collapsed, childIds} = this.props;
+    const {collapsed, childIds, ...props} = this.props;
     let className = 'collapsible-item';
     className += collapsed ? ' collapsed' : ' expanded';
     if (childIds.length) {

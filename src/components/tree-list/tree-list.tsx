@@ -21,7 +21,7 @@ export type TreeListProps = {
 };
 
 export class TreeList extends React.Component<TreeListProps> {
-  static defaultProps: {
+  static defaultProps = {
     role: 'tree',
   }
 

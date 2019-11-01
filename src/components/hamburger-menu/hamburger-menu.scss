@@ -1,0 +1,63 @@
+@import '../../colors.scss';
+
+.hamburger-menu {
+  top: 1em;
+  left: 1em;
+
+  .icon-container {
+    cursor: pointer;
+    display: none;
+  }
+
+  .child-container {
+    position: fixed;
+    top: 2.9em;
+    left: 0;
+    width: 11em;
+    padding: 0;
+    margin: 0;
+
+    &.collapsed {
+      display: none;
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .hamburger-menu {
+    .icon-container {
+      display: block;
+    }
+
+    .child-container {
+      background: $background-color-primary;
+      width: 100%;
+      height: calc(100% - 2.9em);
+      left: 0;
+      top: 2.9em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      nav {
+        height: 80%;
+        width: 100%;
+
+        .ham-nav {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          align-items: center;
+          margin: 0;
+          height: 100%;
+          padding: 0;
+          width: 100%;
+
+          .list-item {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
