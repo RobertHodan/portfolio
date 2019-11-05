@@ -22,11 +22,12 @@ export class NavTreeList extends React.Component<NavTreeListProps> {
     const {rootIds, listMap, ...props} = this.props;
 
     return (
-      <nav>
+      <nav className={this.props.className || ''}>
         <TreeListController
           functionItemContent={ this.createItemContent as navListItemCallback}
           rootIds={ rootIds }
           listMap={ listMap }
+          selectedId={ this.props.selectedId }
         ></TreeListController>
       </nav>
     );

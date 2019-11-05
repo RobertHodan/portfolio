@@ -3,8 +3,8 @@ import './button.scss';
 
 export type ButtonProps = {
   className?: string,
-  children: React.ReactNode,
-  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  children?: React.ReactNode,
+  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
 export class Button extends React.Component<ButtonProps> {
@@ -12,9 +12,9 @@ export class Button extends React.Component<ButtonProps> {
     const { className, onClick, children } = this.props;
 
     return (
-      <div className={`button ${className}`} role="button" onClick={onClick} tabIndex={0}>
+      <button className={`button ${className || ''}`} role="button" onClick={onClick} tabIndex={0}>
         {children}
-      </div>
+      </button>
     )
   }
 }

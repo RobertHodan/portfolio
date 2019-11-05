@@ -13,7 +13,7 @@ export type ListMap = {
   [id: string]: ListMapItem,
 }
 
-type ListItemCallback = (props: ListMapItem) => React.ReactNode;
+export type ListItemCallback = (props: ListMapItem) => React.ReactNode;
 type GenericCallback = <T>(props: ListMapItem & T) => React.ReactNode;
 
 export type ListProps = {

@@ -1,7 +1,6 @@
 import React from 'react';
-import { ListProps, ListMapItem, List, ListMap } from "../list/list";
+import { ListProps, ListMapItem, List } from "../list/list";
 import { Link } from 'react-router-dom';
-import { ListItem } from '../list-item/list-item';
 
 export type NavListMapItem = {
   path: string,
@@ -19,11 +18,13 @@ type navListItemCallback = <NavListMapItem> (props: NavListMapItem) => React.Rea
 
 export class NavList extends React.Component<NavListProps> {
   render() {
+    const {className, ...props} = this.props;
+
     return (
-      <nav>
+      <nav className={className}>
         <List
           functionItemContent={ this.createItemContent as navListItemCallback}
-          {...this.props}
+          {...props}
         ></List>
       </nav>
     );
@@ -34,7 +35,7 @@ export class NavList extends React.Component<NavListProps> {
 
     return (
       <Link to={path}>
-        {item.label}
+        <span>{item.label}</span>
       </Link>
     );
   }

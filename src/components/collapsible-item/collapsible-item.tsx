@@ -10,6 +10,7 @@ export type CollapsibleItemProps = ListItemProps & {
   childIds: string[],
   onLabelClick?: (props: TreeListItemProps, event: React.MouseEvent) => void,
   onItemClick?: (props: TreeListItemProps, event: React.MouseEvent) => void,
+  functionItemContent?: () => React.ReactNode,
   collapsed?: boolean,
 }
 
@@ -34,18 +35,20 @@ export class CollapsibleItem extends React.Component<CollapsibleItemProps> {
   }
 
   render() {
-    const {collapsed, childIds, ...props} = this.props;
+    const {collapsed, childIds, functionItemContent, ...props} = this.props;
     let className = 'collapsible-item';
     className += collapsed ? ' collapsed' : ' expanded';
     if (childIds.length) {
       className += ' has-children';
     }
+    // @ts-ignore
+    const content = functionItemContent ? functionItemContent(this.props) : this.props.label;
 
     return (
       <div className={className}>
         <div onClick={ this.handleOnItemClick }>
           <span className="collapse-icon-container" onClick={ this.handleOnLabelClick }>
-            {this.props.label}
+            {content}
           </span>
           {this.createExpandMarker()}
         </div>
@@ -74,6 +77,7 @@ export class CollapsibleItem extends React.Component<CollapsibleItemProps> {
         listOrder={childIds}
         onLabelClick={ onLabelClick }
         onItemClick={ onItemClick }
+        functionItemContent={ this.props.functionItemContent }
         role={'group'}
       />
     ) : undefined;

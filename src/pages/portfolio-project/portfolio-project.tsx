@@ -68,7 +68,6 @@ export function PortfolioProject() {
   ];
 
   const [map, order] = createMapFromList(data, true) as [NavTreeListMap, string[]];
-  console.log('rendered! rawr');
 
   return (
     <div>

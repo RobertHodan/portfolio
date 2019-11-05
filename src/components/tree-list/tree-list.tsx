@@ -18,6 +18,7 @@ export type TreeListProps = {
   onItemClick?: (props: TreeListItemProps, event: React.MouseEvent) => void,
   role?: string,
   functionItem?: (props: ListItemProps) => JSX.Element,
+  functionItemContent?: any,
 };
 
 export class TreeList extends React.Component<TreeListProps> {
@@ -42,6 +43,7 @@ export class TreeList extends React.Component<TreeListProps> {
           childIds={ item.childIds }
           onLabelClick={ onLabelClick }
           onItemClick={ onItemClick }
+          functionItemContent={this.props.functionItemContent}
           {...props}
         >
         </CollapsibleItem>

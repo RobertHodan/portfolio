@@ -27,6 +27,7 @@ export interface TreeListControllerProps extends Omit<TreeListProps, 'listOrder'
   // Treats a duplicate character as one single character. Eg. 'dd' will become 'd'
   // Used to make functionality a little more responsive
   inputChainTreatDoubleCharAsSingle?: boolean,
+  selectedId?: string,
 };
 
 export interface TreeListControllerState {
@@ -159,6 +160,7 @@ export class TreeListController extends React.Component<TreeListControllerProps,
         onKeyDown={ this.handleOnKeyDown }
         onLabelClick={ this.handleLabelClick }
         onItemClick={ this.handleItemClick }
+        functionItemContent={ this.props.functionItemContent }
       />
     );
   }

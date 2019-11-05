@@ -1,6 +1,7 @@
 import React from 'react';
 import { HamburgerIcon } from '../../icons/icons';
 import './hamburger-menu.scss';
+import { getRouteByPath, RouteDetails } from '../../components/hamburger-menu/routes';
 
 export type HamburgerMenuProps = {
   onClick?: (event: React.MouseEvent) => void,
