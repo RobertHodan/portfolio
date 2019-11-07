@@ -123,6 +123,16 @@ export class TreeListController extends React.Component<TreeListControllerProps,
     this.selectedIds = [];
   }
 
+  componentDidMount() {
+    const item = this.props.selectedId && this.state.listMap[this.props.selectedId];
+
+    if (!item) {
+      return;
+    }
+
+    this.selectItem(item);
+  }
+
   handleOnKeyDown = (event: React.KeyboardEvent) => {
     const eventName = this.getFirstEventName(event.key);
     if (eventName) {

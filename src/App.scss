@@ -13,6 +13,38 @@
   margin: 0 auto;
 }
 
+h1 {
+  font-family: 'Vollkorn', serif;
+}
+
+.blog-container {
+  max-width: 45em;
+  margin: 0 auto;
+  background: $background-color-primary;
+  color: $text-color-primary-third;
+  padding: 0 5% 1% 5%;
+
+  h1 {
+    font-weight: 300;
+    font-size: 30px;
+    color: $text-color-primary;
+    padding-top: 1.5em;
+    padding-bottom: 0.4em;
+  }
+
+  ul {
+    padding-bottom: 1em;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  .caption {
+    margin: 3em 0;
+  }
+}
+
 body {
   background: $background-color-secondary;
 
@@ -29,5 +61,19 @@ body {
     font: inherit;
     cursor: pointer;
     outline: inherit;
+  }
+}
+
+
+
+@media only screen and (max-width: 1300px) {
+  .blog-container {
+    margin-left: 16em;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .blog-container {
+    margin: 0 auto;
   }
 }

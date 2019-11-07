@@ -2,15 +2,18 @@
 
 .image-slider {
   position: relative;
+  display: flex;
 
   .image-container {
-    padding-bottom: 1.8em;
-    margin: 0;
-    align-self: center;
+    margin: 0 4em;
 
     &.is-svg {
       align-self: unset;
     }
+  }
+
+  .image-viewer {
+    width: 100%;
   }
 
   svg {
@@ -28,8 +31,9 @@
   .button {
     position: absolute;
     height: 100%;
-    width: 5em;
+    width: 4em;
     display: flex;
+    align-self: center;
     align-items: center;
     justify-content: center;
     user-select: none;
@@ -60,7 +64,7 @@
     bottom: 0;
 
     li {
-      padding: 0.3em 0.1em;
+      padding: 0.25em 0.2em;
     }
   }
 }

@@ -33,7 +33,6 @@ export class List extends React.Component<ListProps> {
 
   render() {
     const { listMap, className, onKeyDown, role } = this.props;
-    console.log('rendered');
     // Reset all selections
     for (const id of this.allSelectedIds) {
       listMap[id].selected = false;

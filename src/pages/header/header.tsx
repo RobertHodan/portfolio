@@ -68,12 +68,13 @@ export function Header() {
       <Link to={'/'}>
         <h1>Robert Hodan</h1>
       </Link>
-      <div className={'spacing-div'}>
+      <div className={'spacing-div nav-container'}>
         <NavList
           listMap={ map }
           listOrder={ order }
           className={ 'header-nav' }
         ></NavList>
+        {projectNav}
       </div>
     </header>
   );

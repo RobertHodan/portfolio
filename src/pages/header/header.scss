@@ -10,6 +10,7 @@
   align-items: center;
   color: $text-color-primary;
   border-bottom: 1px solid $border-color-secondary;
+  z-index: 1;
 
   h1 {
     font-size: 1.286em;
@@ -20,12 +21,16 @@
     width: 25em;
   }
 
-  .header-nav, .nav-switch {
+  .header-nav, .list {
     display: flex;
     justify-content: space-around;
     padding: 0;
     margin: 0;
     height: 3.5em;
+
+    .list {
+      width: 100%;
+    }
 
     .list-item {
       color: $text-color-primary;
@@ -40,6 +45,15 @@
       }
 
       &:hover {
+        background: $background-color-secondary;
+        border-bottom: 1px solid $background-color-secondary;
+      }
+    }
+  }
+
+  .nav-switch {
+    .list-item {
+      &:hover {
         background: initial;
         color: $text-color-highlight;
         border-bottom: initial;
@@ -49,6 +63,15 @@
         }
       }
     }
+  }
+
+  .nav-container .project-nav {
+    position: fixed;
+    left: 0;
+    margin-top: 1em;
+    width: 14em;
+    background: $background-color-secondary;
+    height: initial;
   }
 
   .child-container {
@@ -62,7 +85,6 @@
 
     ul {
       height: 100%;
-      overflow: scroll;
       background: none;
       padding: 0 1.2em;
       margin: 0;
@@ -93,15 +115,26 @@
 
     .list-item {
       border-bottom: 1px solid $border-color-primary;
+      max-width: initial;
 
-      &.selected {
+      &.selected, &:hover.selected {
         border-bottom: 1px solid $highlight-color-primary;
       }
     }
   }
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: 800px) {
     height: 2.9em;
+
+    .nav-container .project-nav {
+      display: none;
+    }
+
+    .project-nav {
+      ul {
+        overflow: scroll;
+      }
+    }
 
     .spacing-div, .header-nav {
       width: 5em;

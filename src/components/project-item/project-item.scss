@@ -54,8 +54,12 @@
   }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 800px) {
   .project-item {
+
+    &:nth-child(odd) {
+      flex-direction: row;
+    }
 
     .project-details {
       padding-left: 1em;

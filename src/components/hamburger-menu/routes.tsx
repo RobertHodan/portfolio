@@ -4,6 +4,7 @@ import { PortfolioProject } from '../../pages/portfolio-project/portfolio-projec
 import { getNextUniqueId } from '../../utils/utils';
 import { Route } from 'react-router';
 import { NavTreeListMap, NavTreeListMapItem } from '../nav-tree-list.tsx/nav-tree-list';
+import { MockupPhase } from '../../pages/portfolio-project/mockup-phase';
 
 export type RouteDetails = {
   childPaths: string[],
@@ -33,21 +34,24 @@ const routes: RouteCoreDetails[] = [{
   path: '/resume',
 }, {
   path: '/portfolio-project',
-  component: PortfolioProject,
-}, {
-  path: '/portfolio-project/overview',
-}, {
+  component: MockupPhase, //PortfolioProject,
+}
+// , {
+//   path: '/portfolio-project/overview',
+// }
+, {
   path: '/portfolio-project/mockup-phase',
+  component: MockupPhase,
 }, {
-  path: '/portfolio-project/mockup-phase/mockup',
+  path: '/portfolio-project/mockup-phase#mockup',
 }, {
-  path: '/portfolio-project/mockup-phase/wireframes',
+  path: '/portfolio-project/mockup-phase#wireframes',
 }, {
-  path: '/portfolio-project/mockup-phase/grid-view',
+  path: '/portfolio-project/mockup-phase#grid-view',
 }, {
-  path: '/portfolio-project/mockup-phase/main-page',
+  path: '/portfolio-project/mockup-phase#main-page',
 }, {
-  path: '/portfolio-project/mockup-phase/project-page',
+  path: '/portfolio-project/mockup-phase#project-page',
 }, {
   path: '/portfolio-project/development-phase',
 }, {
@@ -70,17 +74,18 @@ function createRouteTreeListMap() {
   let rootProjectId = '';
   for (const route of routes) {
     // Is item a root item
-    if (route.path.split('/').length === 2) {
+    if (route.path.split(/[\/,#]+/).length === 2) {
       rootParentId = route.path;
     }
-    if (route.path.split('/').length === 3) {
+    if (route.path.split(/[\/,#]+/).length === 3) {
       rootProjectId = route.path;
     }
     const data = routeTreeListMap[rootParentId] || [{}, []];
 
-    const parentPath = route.path.substr(0, route.path.lastIndexOf('/'));
+    const lastIndex = route.path.lastIndexOf('#') !== -1 ? route.path.lastIndexOf('#') : route.path.lastIndexOf('/');
+    const parentPath = route.path.substr(0, lastIndex);
     const parent = data[0][parentPath];
-    let routeSegments = route.path.split('/');
+    let routeSegments = route.path.split(/[\/,#]+/);
     let routeLabel = routeSegments[routeSegments.length-1];
     routeLabel = routeLabel.replace('-', ' ');
     const current: NavTreeListMapItem = {
@@ -107,12 +112,12 @@ function createRouteTreeListMap() {
   }
 }
 createRouteTreeListMap();
-console.log(routeTreeListMap);
 
 function createRouteByPath() {
   const map: RouteMap = {};
   for (const route of routes) {
-    const parentPath = route.path.substr(0, route.path.lastIndexOf('/'));
+    const lastIndex = route.path.lastIndexOf('#') !== -1 ? route.path.lastIndexOf('#') : route.path.lastIndexOf('/');
+    const parentPath = route.path.substr(0, lastIndex);
     const parent = map[parentPath];
     const current: RouteDetails = {
       childPaths: [],
