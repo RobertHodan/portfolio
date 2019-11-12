@@ -3,23 +3,21 @@ import { createMapFromLabels } from '../../utils/utils';
 import { List } from '../../components/list/list';
 import { ListItemProps } from '../../components/list-item/list-item';
 import './footer.scss';
-import emailIcon from '../../icons/email.svg';
-import githubIcon from '../../icons/github.svg';
-import twitterIcon from '../../icons/twitter.svg';
+import { EmailIcon, TwitterIcon, GitHubIcon } from '../../icons/icons';
 
 export function Footer() {
   const mapToData: any = {
     'roberthodan@outlook.com': {
       href: 'mailto:roberthodan@outlook.com',
-      icon: emailIcon,
+      icon: EmailIcon,
     },
     '@RobertHodan': {
       href: 'https://twitter.com/RobertHodan',
-      icon: twitterIcon,
+      icon: TwitterIcon,
     },
     'RobertHodan': {
       href: 'https://github.com/RobertHodan',
-      icon: githubIcon,
+      icon: GitHubIcon,
     },
   }
   const [map, order] = createMapFromLabels(Object.keys(mapToData));
@@ -31,7 +29,7 @@ export function Footer() {
     return (
       <a href={mapToData[props.label].href}>
         <div className='icon'>
-          <img src={mapToData[props.label].icon}></img>
+          {mapToData[props.label].icon}
         </div>
         {props.label}
       </a>
@@ -39,7 +37,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className={'footer'}>
+    <footer className={'footer'} id="contact">
       <p>Robert Hodan &copy; Copyright 2019</p>
       <List
         listMap={ map }

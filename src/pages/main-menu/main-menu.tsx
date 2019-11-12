@@ -17,7 +17,7 @@ export function MainMenu() {
         description={'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nec urna ultricies, semper purus at, ullamcorper ipsum. Nam dui enim, lacinia eget vestibulum et, facilisis sed leo. Morbi in euismod enim, ac elementum turpis. Integer lacus elit, pulvinar auctor ex quis, vulputate bibendum turpis. Aenean suscipit urna ac leo tristique, eget porttitor neque mollis. Proin vel auctor metus. Fusce augue tortor, bibendum vel tortor ac, varius hendrerit felis.'}
         page={'/portfolio-project'}
       ></ProjectItem>
-      <ProjectItem
+      {/* <ProjectItem
         title={'Lorem ipsum dolor sit amet'}
         companyName={'Deserunt Mollit'}
         description={'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nec urna ultricies, semper purus at, ullamcorper ipsum. Nam dui enim, lacinia eget vestibulum et, facilisis sed leo. Morbi in euismod enim, ac elementum turpis. Integer lacus elit, pulvinar auctor ex quis, vulputate bibendum turpis. Aenean suscipit urna ac leo tristique, eget porttitor neque mollis. Proin vel auctor metus. Fusce augue tortor, bibendum vel tortor ac, varius hendrerit felis.'}
@@ -26,7 +26,7 @@ export function MainMenu() {
         title={'Lorem ipsum dolor sit amet'}
         companyName={'Deserunt Mollit'}
         description={'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nec urna ultricies, semper purus at, ullamcorper ipsum. Nam dui enim, lacinia eget vestibulum et, facilisis sed leo. Morbi in euismod enim, ac elementum turpis. Integer lacus elit, pulvinar auctor ex quis, vulputate bibendum turpis. Aenean suscipit urna ac leo tristique, eget porttitor neque mollis. Proin vel auctor metus. Fusce augue tortor, bibendum vel tortor ac, varius hendrerit felis.'}
-      ></ProjectItem>
+      ></ProjectItem> */}
     </div>
   );
 }

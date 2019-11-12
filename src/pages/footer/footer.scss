@@ -30,12 +30,25 @@
       }
     }
 
+    svg {
+      transition: fill 0.5s;
+    }
+
     a {
       text-decoration: none;
       display: flex;
       align-items: center;
       padding: 0 0 1em 1.5em;
       border-left: 0.1em solid $highlight-color-primary;
+      transition: color 0.5s;
+
+      &:hover {
+        color: $text-color-highlight;
+
+        svg {
+          fill: $text-color-highlight;
+        }
+      }
 
       .icon {
         margin-right: 0.5em;

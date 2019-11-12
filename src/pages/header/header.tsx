@@ -23,13 +23,8 @@ export function Header() {
     }, {
       id: getNextUniqueId(),
       label: 'Contact',
-      path: '/contact',
+      path: '#contact',
     },
-    {
-      id: getNextUniqueId(),
-      label: 'Resume',
-      path: '/resume',
-    }
   ];
 
   const [isProjectMenuOpen, setIsProjectMenuOpen] = useState(true);

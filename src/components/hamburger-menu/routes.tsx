@@ -5,6 +5,7 @@ import { getNextUniqueId } from '../../utils/utils';
 import { Route } from 'react-router';
 import { NavTreeListMap, NavTreeListMapItem } from '../nav-tree-list.tsx/nav-tree-list';
 import { MockupPhase } from '../../pages/portfolio-project/mockup-phase';
+import { About } from '../../pages/about/about';
 
 export type RouteDetails = {
   childPaths: string[],
@@ -28,45 +29,43 @@ const routes: RouteCoreDetails[] = [{
   component: MainMenu,
 }, {
   path: '/about',
-}, {
-  path: '/contact',
-}, {
-  path: '/resume',
+  component: About,
 }, {
   path: '/portfolio-project',
-  component: MockupPhase, //PortfolioProject,
+  component: PortfolioProject,
 }
 // , {
 //   path: '/portfolio-project/overview',
 // }
-, {
-  path: '/portfolio-project/mockup-phase',
-  component: MockupPhase,
-}, {
-  path: '/portfolio-project/mockup-phase#mockup',
-}, {
-  path: '/portfolio-project/mockup-phase#wireframes',
-}, {
-  path: '/portfolio-project/mockup-phase#grid-view',
-}, {
-  path: '/portfolio-project/mockup-phase#main-page',
-}, {
-  path: '/portfolio-project/mockup-phase#project-page',
-}, {
-  path: '/portfolio-project/development-phase',
-}, {
-  path: '/portfolio-project/development-phase/development',
-}, {
-  path: '/portfolio-project/development-phase/development/why-scss',
-}, {
-  path: '/portfolio-project/development-phase/development/why-typescript',
-}, {
-  path: '/portfolio-project/development-phase/development/why-react',
-}, {
-  path: '/portfolio-project/development-phase/tree-list',
-}, {
-  path: '/portfolio-project/conclusion',
-}];
+// , {
+//   path: '/portfolio-project/mockup-phase',
+//   component: MockupPhase,
+// }, {
+//   path: '/portfolio-project/mockup-phase#mockup',
+// }, {
+//   path: '/portfolio-project/mockup-phase#wireframes',
+// }, {
+//   path: '/portfolio-project/mockup-phase#grid-view',
+// }, {
+//   path: '/portfolio-project/mockup-phase#main-page',
+// }, {
+//   path: '/portfolio-project/mockup-phase#project-page',
+// }, {
+//   path: '/portfolio-project/development-phase',
+// }, {
+//   path: '/portfolio-project/development-phase/development',
+// }, {
+//   path: '/portfolio-project/development-phase/development/why-scss',
+// }, {
+//   path: '/portfolio-project/development-phase/development/why-typescript',
+// }, {
+//   path: '/portfolio-project/development-phase/development/why-react',
+// }, {
+//   path: '/portfolio-project/development-phase/tree-list',
+// }, {
+//   path: '/portfolio-project/conclusion',
+// },
+];
 
 let routeTreeListMap: { [id: string]: [NavTreeListMap, string[]] } = {};
 function createRouteTreeListMap() {
@@ -137,6 +136,11 @@ function createRouteByPath() {
   return map;
 }
 const routeByPath = createRouteByPath();
+
+// @ts-ignore
+window.routeByPath = routeByPath;
+// @ts-ignore
+window.routeMap = routeTreeListMap;
 
 const routeComponents = routes.filter((route) => {
   return route.component;
