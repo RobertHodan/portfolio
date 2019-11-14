@@ -6,7 +6,7 @@
   font-family: 'Vollkorn', serif;
   background: $background-color-primary;
   display: grid;
-  grid-template-columns: 40% 20% 40%;
+  grid-template-columns: 35% 30% 35%;
   grid-template-rows: 100%;
   align-items: center;
   color: $text-color-primary;
@@ -15,10 +15,22 @@
 
   a {
     justify-self: center;
+  }
+
+  > a {
+    height: 100%;
+    display: flex;
+    padding: 0 1em;
+    border: 1px solid $background-color-primary;
+    transition: background 0.25s, border 0.25s;
+
+    &:hover {
+      background: $background-color-secondary;
+      border: 1px solid $background-color-secondary;
+    }
 
     h1 {
       font-size: 1.286em;
-      margin: 0;
     }
   }
 
@@ -51,6 +63,8 @@
       align-items: center;
       place-content: center;
       flex-grow: 1;
+      border: 1px solid $background-color-primary;
+      transition: background 0.25s, border 0.25s;
 
       &.selected {
         border-bottom: 0.2em solid $highlight-color-primary;
@@ -142,6 +156,7 @@
 
   @media only screen and (max-width: 800px) {
     height: 2.9em;
+    grid-template-columns: 10% 80% 10%;
 
     .nav-container .project-nav {
       display: none;

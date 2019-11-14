@@ -6,6 +6,9 @@ import { Route } from 'react-router';
 import { NavTreeListMap, NavTreeListMapItem } from '../nav-tree-list.tsx/nav-tree-list';
 import { MockupPhase } from '../../pages/portfolio-project/mockup-phase';
 import { About } from '../../pages/about/about';
+import { PortfolioProjectOverview } from '../../pages/portfolio-project/overview';
+import { TextHighlighter } from '../../pages/text-highlighter/text-highlighter';
+import { TreeDropdownList } from '../../pages/tree-dropdown-list/tree-dropdown-list';
 
 export type RouteDetails = {
   childPaths: string[],
@@ -31,12 +34,18 @@ const routes: RouteCoreDetails[] = [{
   path: '/about',
   component: About,
 }, {
+  path: '/text-highlighting',
+  component: TextHighlighter,
+}, {
+  path: '/tree-dropdown-list',
+  component: TreeDropdownList,
+}, {
   path: '/portfolio-project',
   component: PortfolioProject,
+}, {
+  path: '/portfolio-project/overview',
+  component: PortfolioProjectOverview,
 }
-// , {
-//   path: '/portfolio-project/overview',
-// }
 // , {
 //   path: '/portfolio-project/mockup-phase',
 //   component: MockupPhase,

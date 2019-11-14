@@ -36,7 +36,7 @@ export function Header() {
   const projectNav = useMemo(() => {
     const rootPath = `/${history.location.pathname.split('/')[1]}`;
     const [map, order] = getRouteNavListDataByRootPath(rootPath);
-    if (!order.length) {
+    if (order.length <= 1) {
       return;
     }
 

@@ -15,7 +15,7 @@ export const GitHubIcon: React.ReactNode = (
 );
 
 export const ArrowIcon: React.ReactNode = (
-  <svg width="26" height="40" viewBox="0 0 26 40" fill="#C4C4C4" xmlns="http://www.w3.org/2000/svg">
+  <svg width="26" height="40" viewBox="0 0 26 40" xmlns="http://www.w3.org/2000/svg">
     <path d="M23 3L5 20.3617L23 37" stroke="#AAAAAA" stroke-width="6"/>
   </svg>
 );

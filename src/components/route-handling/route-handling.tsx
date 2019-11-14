@@ -6,16 +6,20 @@ export function RouteHandling(props: any) {
   const history = useHistory();
   useEffect(() => {
     const location = history.location;
-    window.scrollTo(0, 0);
+    let hasScrolled = false;
     if (location.hash) {
       const element = document.getElementById(location.hash.split('#')[1]);
       if (element) {
         // Scroll to the element
-        element.scrollIntoView();
+        element.scrollIntoView({behavior: 'smooth'});
+        hasScrolled = true;
       }
     }
+
+    if (!hasScrolled) {
+      window.scrollTo(0, 0);
+    }
   });
-  console.log('rawr')
 
   return props.children;
 }
