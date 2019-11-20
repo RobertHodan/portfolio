@@ -12,7 +12,7 @@ export class Button extends React.Component<ButtonProps> {
     const { className, onClick, children } = this.props;
 
     return (
-      <button className={`button ${className || ''}`} role="button" onClick={onClick} tabIndex={0}>
+      <button className={`button ${className || ''}`} onClick={onClick}>
         {children}
       </button>
     )

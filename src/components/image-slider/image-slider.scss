@@ -23,7 +23,7 @@
   }
 
   &:hover {
-    background: rgba(21, 21, 21, 0.9);
+    // background: rgba(21, 21, 21, 0.9);
   }
 
   .button {
@@ -34,8 +34,8 @@
     align-self: center;
     align-items: center;
     justify-content: center;
-    user-select: none;
-    background: none;
+    // user-select: none;
+    // background: none;
     transition: background 0.25s;
 
     svg path {
@@ -78,6 +78,46 @@
   @media only screen and (max-width: 800px) {
     .button {
       background: rgba(21, 21, 21, 0.75);
+    }
+  }
+}
+
+.modal {
+  .image-slider {
+    height: 100%;
+    width: 100%;
+
+    .button {
+      // height: 5em;
+      // width: 5em;
+      // border-radius: 5em;
+      height: 12em;
+      margin: 0.5em;
+    }
+
+    .image-container {
+      padding: 2em;
+    }
+
+    .image-viewer {
+      background: none;
+      max-height: 100%;
+    }
+
+    li {
+      padding: 0.25em 0.2em;
+    }
+
+    .radio-indicator {
+      width: 0.8em;
+      height: 0.8em;
+      background: #6b6b6b;
+    }
+
+    .list-item.selected{
+      .radio-indicator {
+        background: #fbf9f9;
+      }
     }
   }
 }

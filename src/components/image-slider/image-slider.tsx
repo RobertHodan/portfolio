@@ -13,6 +13,7 @@ export type ImageSliderProps = {
   children: React.ReactNode,
   style?: React.CSSProperties,
   disableModal?: boolean,
+  onClick?: () => void,
 }
 
 type ImageSliderState = {
@@ -40,6 +41,8 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
       this.preventDefaultClick = false;
       return;
     }
+
+    this.toggleModal();
   }
 
   handlePrevButtonClick = () => {
@@ -59,17 +62,10 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
 
   handleOnKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
-      if ((event.target as HTMLDivElement).className.includes('prev')) {
-        this.prevImage();
-      }
-      else if ((event.target as HTMLDivElement).className.includes('next')) {
-        this.nextImage()
-      } else if (!this.state.isModal) {
+      if (!this.state.isModal) {
         this.toggleModal(true);
       }
-    }
-
-    if (event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft') {
       this.prevImage();
     } else if (event.key === 'ArrowRight') {
       this.nextImage();
@@ -79,8 +75,6 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
   }
 
   toggleModal(isOpen: boolean = !this.state.isModal) {
-    // Leave modal creation until later
-    // Lots of work will be needed for this to work properly
     return;
     if (this.props.disableModal) {
       return;
@@ -115,14 +109,18 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
 
   render() {
     const { isModal } = this.state;
+    const { style, ...props } = this.props;
     const content = this.createImageSliderContent();
     const modal = isModal ? (
-      <Modal>
-        <ImageViewer
+      <Modal
+        onKeyDown={ this.handleOnKeyDown }
+      >
+        <ImageSlider
           disableModal={ true }
-          {...this.props}
+          onClick={ this.handleOnClick }
+          {...props}
         >
-        </ImageViewer>
+        </ImageSlider>
       </Modal>
     ) : undefined;
 
@@ -130,9 +128,9 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
       <>
         <div
           className={ this.props.className || 'image-slider' }
-          style={ this.props.style }
+          style={ style }
           onClick={ this.handleOnClick }
-          onKeyDown={ this.handleOnKeyDown }
+          onKeyDown={ !props.disableModal ? this.handleOnKeyDown : undefined }
           tabIndex={ 0 }
         >
           {content}
