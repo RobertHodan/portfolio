@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './main-menu.scss';
 import { ProjectItem } from '../../components/project-item/project-item';
 import PortfolioTile from './imgs/portfolio-tile.png';
 import HighlighterTile from './imgs/highlighter-tile.png';
 import TreeDropdownListTile from './imgs/tree-dropdown-tile.png';
+import { startLineCanvas } from '../title-card/title-card';
 
 export function MainMenu() {
+  useEffect(() => {
+    const canvas = document.getElementById('title-card') as HTMLCanvasElement;
+    const stopLineCanvas = startLineCanvas(canvas);
+
+    return stopLineCanvas;
+  }, []);
+
   return (
     <div className={'main-menu'}>
       <div className={'landing-screen'}>
+        <canvas id='title-card'></canvas>
         <div className={'title'}>
           <h1>Robert Hodan</h1>
           <h2>Front-End Web Developer</h2>

@@ -8,6 +8,14 @@
     margin-left: 5em;
     align-items: flex-end;
 
+    canvas {
+      position: absolute;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: -1;
+    }
+
     .title {
       border-left: 0.4em solid $highlight-color-primary;
       padding: 0.5em 2.6em;

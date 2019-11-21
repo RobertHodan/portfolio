@@ -1,6 +1,5 @@
 import React from 'react';
 import './project-item.scss';
-import placeholderPNG from '../../projects/placeholder.png';
 import { Link } from 'react-router-dom';
 
 type ProjectItemProps = {
@@ -13,7 +12,7 @@ type ProjectItemProps = {
 }
 
 export function ProjectItem(props: ProjectItemProps) {
-  const imageSrc = props.imageSrc || placeholderPNG;
+  const imageSrc = props.imageSrc;
   let companyName = ( <h2>{props.companyName}</h2> );
   if (props.companyLink) {
     companyName = (
