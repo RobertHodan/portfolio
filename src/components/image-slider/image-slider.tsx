@@ -43,6 +43,10 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
     }
 
     this.toggleModal();
+
+    if (this.props.onClick) {
+      this.props.onClick();
+    }
   }
 
   handlePrevButtonClick = () => {
@@ -61,6 +65,13 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
   }
 
   handleOnKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      this.toggleModal(false);
+    }
+
+    if (this.state.isModal) {
+      return;
+    }
     if (event.key === 'Enter' || event.key === ' ') {
       if (!this.state.isModal) {
         this.toggleModal(true);
@@ -69,13 +80,15 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
       this.prevImage();
     } else if (event.key === 'ArrowRight') {
       this.nextImage();
-    } else if (event.key === 'Escape') {
-      this.toggleModal(false);
     }
   }
 
+  handleCloseModal = () => {
+    this.toggleModal(false);
+  }
+
   toggleModal(isOpen: boolean = !this.state.isModal) {
-    return;
+    // return;
     if (this.props.disableModal) {
       return;
     }
@@ -114,6 +127,7 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
     const modal = isModal ? (
       <Modal
         onKeyDown={ this.handleOnKeyDown }
+        onCloseClick={this.handleCloseModal}
       >
         <ImageSlider
           disableModal={ true }
@@ -130,7 +144,7 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
           className={ this.props.className || 'image-slider' }
           style={ style }
           onClick={ this.handleOnClick }
-          onKeyDown={ !props.disableModal ? this.handleOnKeyDown : undefined }
+          onKeyDown={ this.handleOnKeyDown }
           tabIndex={ 0 }
         >
           {content}
@@ -151,6 +165,7 @@ export class ImageSlider extends React.Component<ImageSliderProps, ImageSliderSt
         {indicators}
         <ImageViewer
           style={this.props.style}
+          disableModal={true}
         >
          {image}
         </ImageViewer>
