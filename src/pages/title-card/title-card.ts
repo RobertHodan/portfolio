@@ -18,7 +18,6 @@ class LineAnim {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
   modifier1: number = 0;
-  modifier2: number = 3;
 
   constructor (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -36,7 +35,6 @@ class LineAnim {
     const height = this.canvas.height;
     const width = this.canvas.width;
     this.modifier1 += 0.01;
-    this.modifier2 += 0.01;
     const lines = [
       [
         0, this.canvas.height / 2,
@@ -60,21 +58,21 @@ class LineAnim {
       ],
     ];
 
-    lines[0][1] += Math.cos(this.modifier1) * 80;
-    lines[0][3] -= Math.sin(this.modifier1) * 120;
-    lines[0][5] += Math.cos(this.modifier1) * 100;
+    lines[0][1] += Math.sin(this.modifier1) * 80;
+    lines[0][3] += Math.sin(this.modifier1 + 2) * 120;
+    lines[0][5] += Math.sin(this.modifier1 + 4) * 100;
 
-    lines[1][1] += Math.sin(this.modifier2) * 80;
-    lines[1][3] -= Math.sin(this.modifier2) * 100;
-    lines[1][5] -= Math.sin(this.modifier1) * 100;
+    lines[1][1] += Math.sin(this.modifier1 + 4) * 80;
+    lines[1][3] += Math.sin(this.modifier1) * 100;
+    lines[1][5] += Math.sin(this.modifier1 + 2) * 100;
 
-    lines[2][1] += Math.sin(this.modifier2) * 120;
-    lines[2][3] -= Math.cos(this.modifier2) * 120;
-    lines[2][5] += Math.cos(this.modifier2) * 100;
+    lines[2][1] += Math.sin(this.modifier1 + 3) * 120;
+    lines[2][3] += Math.sin(this.modifier1 + 5) * 120;
+    lines[2][5] += Math.sin(this.modifier1 + 1) * 100;
 
-    lines[3][1] += Math.sin(this.modifier2) * 80;
-    lines[3][3] -= Math.cos(this.modifier1) * 120;
-    lines[3][5] += Math.cos(this.modifier2) * 100;
+    lines[3][1] += Math.sin(this.modifier1 + 1) * 80;
+    lines[3][3] += Math.sin(this.modifier1 + 3) * 120;
+    lines[3][5] += Math.sin(this.modifier1 + 5) * 100;
 
     for (const line of lines) {
       this.createCurve(line);
