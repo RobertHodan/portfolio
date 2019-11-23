@@ -1,15 +1,12 @@
 export function startLineCanvas(canvas: HTMLCanvasElement) {
-  let intervalId;
   let context = canvas.getContext('2d');
   if (!context) {
     return;
   }
   const lineAnim = new LineAnim(canvas, context);
   const anim = window.requestAnimationFrame(lineAnim.updateLineCanvas);
-  console.log('boo');
 
   return () => {
-    console.log('rawr');
     window.cancelAnimationFrame(anim);
   }
 }
@@ -22,18 +19,12 @@ class LineAnim {
   constructor (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     this.canvas = canvas;
     this.context = context;
-    // @ts-ignore
-    window.context = this.context;
-    // @ts-ignore
-    window.canvas = this.canvas;
 
     this.updateLineCanvas = this.updateLineCanvas.bind(this);
   }
 
   updateLineCanvas() {
     this.clearCanvas();
-    const height = this.canvas.height;
-    const width = this.canvas.width;
     this.modifier1 += 0.01;
     const lines = [
       [

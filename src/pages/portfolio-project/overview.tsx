@@ -75,7 +75,10 @@ export function PortfolioProjectOverview() {
         </ImageViewer>
       </Caption>
       <p>
-        The landing image was also removed in favour of an abstract card. This allowed for more flexability in terms of screen sizes, and it better fit with the aesthetics.
+        Roboto and Vollkorn were used as fonts. I love the simplicity of Roboto, and Vollkorn seemed to fit it well as a serif font - this font was used for headers to give them more weight.
+      </p>
+      <p>
+        The landing image was also removed in favour of a dynamic card. I felt this fit better with the aesthetics, while hopefully making the initial impression more memorable.
       </p>
       <Caption
         caption={(<><i>{`Figure ${captionNum += 1}.`}</i> Different designs for the landing page</>)}
@@ -89,7 +92,7 @@ export function PortfolioProjectOverview() {
         </ImageSlider>
       </Caption>
       <p>
-        The landing image was also removed in favour of an abstract card. This allowed for more flexability in terms of screen sizes, and it better fit with the aesthetics.
+        I wanted the footer to contain my contact information, as well as any other relevant links. I never really use Twitter, but I saw that as a good way to informally contact me. A sort of text messaging without needing to know my cellphone number.
       </p>
       <Caption
         caption={(<><i>{`Figure ${captionNum += 1}.`}</i> Different designs for the footer</>)}
