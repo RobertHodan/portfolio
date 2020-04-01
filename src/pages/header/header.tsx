@@ -130,6 +130,8 @@ const createNavList = (
       listMap={ map }
       listOrder={ order }
       className={ 'ham-nav' }
+      // @ts-ignore
+      onItemClick={ () => { window.closeHamburgerMenu && window.closeHamburgerMenu() }}
     ></NavList>
   );
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { HamburgerIcon } from '../../icons/icons';
 import './hamburger-menu.scss';
-import { getRouteByPath, RouteDetails } from '../../components/hamburger-menu/routes';
 
 export type HamburgerMenuProps = {
   onClick?: (event: React.MouseEvent) => void,
@@ -52,8 +51,14 @@ export class HamburgerMenu extends React.Component<HamburgerMenuProps, Hamburger
         this.setState({isMenuOpen: false});
       }
     }
-  }
 
+    // Quick and horrible fix for mobile
+    // TODO: Rewrite how the hamburger menu is created
+    // @ts-ignore
+    window.closeHamburgerMenu = () => {
+      this.setState({isMenuOpen: false});
+    }
+  }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowResize);
