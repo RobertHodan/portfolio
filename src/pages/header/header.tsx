@@ -15,7 +15,7 @@ export function Header() {
     {
       id: getNextUniqueId(),
       label: 'Works',
-      path: '/',
+      path: '/#works',
     }, {
       id: getNextUniqueId(),
       label: 'About',
